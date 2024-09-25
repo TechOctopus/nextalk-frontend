@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "A Quasar ProjectNextalk is an educational messenger for real-time chat",
   "productName": "NexTalk",
-  "author": "TechOctopus <heorhid@gmail.com>",
+  "author": "Heorhi Davydau <heorhid@gmail.com>, Artemii Gurin <arte.gurin@gmail.com>",
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",
