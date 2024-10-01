@@ -6,7 +6,7 @@
       <q-header elevated>
         <q-toolbar class="WAL__toolbar">
           <q-btn round flat icon="keyboard_arrow_left" class="WAL__drawer-open q-mr-sm" @click="toggleLeftDrawer" />
-          <span class="q-subtitle-1 q-pl-md"> Channel </span>
+          <span class="q-subtitle-1 q-pl-md">{{ channelsStore.currentChannel?.name ?? 'No channel selected' }}</span>
           <q-space />
           <q-btn round flat icon="info" />
         </q-toolbar>
@@ -46,7 +46,13 @@
 
         <q-scroll-area style="height: calc(100% - 100px)">
           <q-list>
-            <q-item v-for="channel in channels" :key="channel.id" clickable v-ripple>
+            <q-item
+              v-for="channel in channelsStore.channels"
+              :key="channel.id"
+              @click="handleChooseChannel(channel.name)"
+              clickable
+              v-ripple
+            >
               <q-item-section>
                 <q-item-label>
                   <span lass="q-subtitle-1 q-pl-md"> {{ channel.name }} </span>
@@ -58,7 +64,7 @@
       </q-drawer>
 
       <q-page-container class="bg-grey-1">
-        <router-view />
+        <router-view :key="channelsStore.currentChannel?.id" />
       </q-page-container>
 
       <q-footer>
@@ -81,31 +87,19 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-
-const channels = [
-  {
-    id: 1,
-    name: 'FIIT',
-  },
-  {
-    id: 2,
-    name: 'VPWA',
-  },
-  {
-    id: 3,
-    name: 'NexTalk',
-  },
-]
+import { useChannelStore } from 'src/stores/channels'
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
   name: 'ChannelLayout',
 
   data() {
     return {
-      channels,
+      channelsStore: useChannelStore(),
       message: '',
       leftDrawerOpen: false,
       search: '',
+      router: useRouter(),
     }
   },
 
@@ -114,8 +108,9 @@ export default defineComponent({
       this.leftDrawerOpen = !this.leftDrawerOpen
     },
 
-    handleChooseChannel() {
+    handleChooseChannel(channelName: string) {
       this.search = ''
+      this.router.push(`/channels/${channelName}`)
     },
   },
 })
