@@ -29,14 +29,14 @@ export const useChannelStore = defineStore('channels', {
   }),
 
   getters: {
-    getChannelById: (state) => (name: string) => {
+    getChannelByName: (state) => (name: string) => {
       return state.channels.find((channel) => channel.name === name)
     },
   },
 
   actions: {
     setCurrentChannel(channelName: string) {
-      this.currentChannel = this.getChannelById(channelName)
+      this.currentChannel = this.getChannelByName(channelName)
     },
 
     resetCurrentChannel() {

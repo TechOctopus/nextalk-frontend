@@ -6,7 +6,7 @@ export default boot(({ router }) => {
   router.beforeEach(async (to, from, next) => {
     if (to && to.name === 'channels') {
       const channelName = to.params.name as string
-      if (channelsStore.getChannelById(channelName)) {
+      if (channelsStore.getChannelByName(channelName)) {
         channelsStore.setCurrentChannel(channelName)
         return next()
       }
