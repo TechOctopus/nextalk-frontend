@@ -8,7 +8,12 @@
           <q-btn round flat icon="keyboard_arrow_left" class="WAL__drawer-open q-mr-sm" @click="toggleLeftDrawer" />
           <span class="q-subtitle-1 q-pl-md">{{ channelsStore.currentChannel?.name ?? 'No channel selected' }}</span>
           <q-space />
-          <q-btn round flat icon="info" />
+          <template v-if="channelsStore.currentChannel">
+            <q-btn round flat icon="info" @click="showInfoDialog = true" />
+            <dialog-wrapper v-model="showInfoDialog" title="Channel info">
+              <channel-info @close="showInfoDialog = false" />
+            </dialog-wrapper>
+          </template>
         </q-toolbar>
       </q-header>
 
@@ -89,9 +94,16 @@
 import { defineComponent } from 'vue'
 import { useChannelStore } from 'src/stores/channels'
 import { useRouter } from 'vue-router'
+import ChannelInfo from 'src/components/ChannelInfo.vue'
+import DialogWrapper from 'src/components/DialogWrapper.vue'
 
 export default defineComponent({
   name: 'ChannelLayout',
+
+  components: {
+    DialogWrapper,
+    ChannelInfo,
+  },
 
   data() {
     return {
@@ -100,6 +112,7 @@ export default defineComponent({
       leftDrawerOpen: false,
       search: '',
       router: useRouter(),
+      showInfoDialog: false,
     }
   },
 
