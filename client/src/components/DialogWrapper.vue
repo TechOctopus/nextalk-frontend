@@ -1,7 +1,7 @@
 <template>
   <q-dialog v-model="show">
-    <q-card style="max-width: 500px; width: 100%">
-      <q-card-section class="row items-center q-pb-none q-mx-md q-mt-md">
+    <q-card :style="{ maxWidth, width: '100%' }">
+      <q-card-section class="row items-center q-pb-none">
         <div class="text-h6">{{ title }}</div>
         <q-space />
         <q-btn icon="close" flat round dense v-close-popup />
@@ -26,6 +26,10 @@ export default defineComponent({
     modelValue: {
       type: Boolean,
       required: true,
+    },
+    maxWidth: {
+      type: String,
+      default: '500px',
     },
   },
 

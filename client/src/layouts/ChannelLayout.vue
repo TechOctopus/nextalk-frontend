@@ -23,12 +23,15 @@
 
           <q-space />
 
-          <q-btn round flat icon="message" />
+          <q-btn round flat icon="chat" @click="showNewChannelDialog = true" />
+          <dialog-wrapper v-model="showNewChannelDialog" title="New channel" maxWidth="400px">
+            <new-channel @close="showNewChannelDialog = false" />
+          </dialog-wrapper>
 
           <q-btn round flat icon="more_vert">
             <q-menu auto-close :offset="[110, 8]">
               <q-list style="min-width: 150px">
-                <q-item clickable>
+                <q-item clickable @click="showNewChannelDialog = true">
                   <q-item-section>New channel</q-item-section>
                 </q-item>
                 <q-item clickable>
@@ -96,6 +99,7 @@ import { useChannelStore } from 'src/stores/channels'
 import { useRouter } from 'vue-router'
 import ChannelInfo from 'src/components/ChannelInfo.vue'
 import DialogWrapper from 'src/components/DialogWrapper.vue'
+import NewChannel from 'src/components/NewChannel.vue'
 
 export default defineComponent({
   name: 'ChannelLayout',
@@ -103,6 +107,7 @@ export default defineComponent({
   components: {
     DialogWrapper,
     ChannelInfo,
+    NewChannel,
   },
 
   data() {
@@ -113,6 +118,7 @@ export default defineComponent({
       search: '',
       router: useRouter(),
       showInfoDialog: false,
+      showNewChannelDialog: false,
     }
   },
 
