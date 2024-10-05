@@ -354,6 +354,14 @@ export const messagesFor1 = [
     mentions: [user],
     createdAt: '2024-10-02',
   },
+  {
+    user: admin,
+    text: 'Hi, how are you?',
+    typing: true,
+    stamp: '13:03',
+    mentions: [],
+    createdAt: '2024-10-02',
+  },
 ] as Message[]
 
 export const messagesFor2 = [

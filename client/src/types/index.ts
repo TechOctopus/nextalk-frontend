@@ -24,4 +24,5 @@ export type Message = {
   mentions: User[]
   createdAt: string
   updatedAt?: string
+  typing?: boolean
 }
