@@ -16,3 +16,12 @@ export type User = {
   createdAt: string
   updatedAt?: string
 }
+
+export type Message = {
+  user: User
+  text: string
+  stamp: string
+  mentions: User[]
+  createdAt: string
+  updatedAt?: string
+}

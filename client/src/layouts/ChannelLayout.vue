@@ -19,7 +19,7 @@
 
       <q-drawer v-model="leftDrawerOpen" show-if-above bordered :breakpoint="690">
         <q-toolbar class="WAL__toolbar">
-          <span class="q-subtitle-1 q-pl-md"> Jon Doe </span>
+          <span class="q-subtitle-1 q-pl-md">{{ fullName }}</span>
 
           <q-space />
 
@@ -97,6 +97,7 @@
 import { defineComponent } from 'vue'
 import { useChannelStore } from 'src/stores/channels'
 import { useRouter } from 'vue-router'
+import { user } from 'src/assets'
 import ChannelInfo from 'src/components/ChannelInfo.vue'
 import DialogWrapper from 'src/components/DialogWrapper.vue'
 import NewChannel from 'src/components/NewChannel.vue'
@@ -119,6 +120,7 @@ export default defineComponent({
       router: useRouter(),
       showInfoDialog: false,
       showNewChannelDialog: false,
+      user,
     }
   },
 
@@ -130,6 +132,12 @@ export default defineComponent({
     handleChooseChannel(channelName: string) {
       this.search = ''
       this.router.push(`/channels/${channelName}`)
+    },
+  },
+
+  computed: {
+    fullName(): string {
+      return `${this.user.firstName} ${this.user.lastName}`
     },
   },
 })
