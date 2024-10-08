@@ -48,17 +48,20 @@ export const channels = [
     name: 'fiit',
     isPrivate: false,
     createdAt: '2024-10-01',
+    status: 'join',
   },
   {
     id: '2',
     name: 'vpwa',
     isPrivate: false,
     createdAt: '2024-08-01',
+    status: 'invite',
   },
   {
     id: '3',
     name: 'nextalk',
     isPrivate: true,
     createdAt: '2024-09-01',
+    status: 'join',
   },
 ] as Channel[]
