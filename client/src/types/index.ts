@@ -4,6 +4,7 @@ export type Channel = {
   isPrivate: boolean
   createdAt: string
   updatedAt?: string
+  status: 'invite' | 'join' | 'revoke' | 'ban' | 'unban' | 'create'
 }
 
 export type User = {

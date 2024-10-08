@@ -44,31 +44,7 @@
           <q-btn round flat icon="close" class="WAL__drawer-close" @click="toggleLeftDrawer" />
         </q-toolbar>
 
-        <q-toolbar>
-          <q-input rounded outlined dense class="WAL__field full-width" v-model="search" placeholder="Search channels">
-            <template v-slot:prepend>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </q-toolbar>
-
-        <q-scroll-area style="height: calc(100% - 100px)">
-          <q-list>
-            <q-item
-              v-for="channel in channelsStore.channels"
-              :key="channel.id"
-              @click="handleChooseChannel(channel.name)"
-              clickable
-              v-ripple
-            >
-              <q-item-section>
-                <q-item-label>
-                  <span lass="q-subtitle-1 q-pl-md"> {{ channel.name }} </span>
-                </q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-scroll-area>
+        <channels-list />
       </q-drawer>
 
       <q-page-container class="bg-grey-1">
@@ -96,11 +72,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useChannelStore } from 'src/stores/channels'
-import { useRouter } from 'vue-router'
 import { user } from 'src/assets'
 import ChannelInfo from 'src/components/ChannelInfo.vue'
 import DialogWrapper from 'src/components/DialogWrapper.vue'
 import NewChannel from 'src/components/NewChannel.vue'
+import ChannelsList from 'src/components/ChannelsList.vue'
 
 export default defineComponent({
   name: 'ChannelLayout',
@@ -109,6 +85,7 @@ export default defineComponent({
     DialogWrapper,
     ChannelInfo,
     NewChannel,
+    ChannelsList,
   },
 
   data() {
@@ -116,8 +93,6 @@ export default defineComponent({
       channelsStore: useChannelStore(),
       message: '',
       leftDrawerOpen: false,
-      search: '',
-      router: useRouter(),
       showInfoDialog: false,
       showNewChannelDialog: false,
       user,
@@ -127,11 +102,6 @@ export default defineComponent({
   methods: {
     toggleLeftDrawer() {
       this.leftDrawerOpen = !this.leftDrawerOpen
-    },
-
-    handleChooseChannel(channelName: string) {
-      this.search = ''
-      this.router.push(`/channels/${channelName}`)
     },
   },
 
