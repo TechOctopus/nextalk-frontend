@@ -19,7 +19,7 @@
 
       <q-drawer v-model="leftDrawerOpen" show-if-above bordered :breakpoint="690">
         <q-toolbar class="WAL__toolbar">
-          <span class="q-subtitle-1 q-pl-md"> Jon Doe </span>
+          <span class="q-subtitle-1 q-pl-md">{{ fullName }}</span>
 
           <q-space />
 
@@ -72,6 +72,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useChannelStore } from 'src/stores/channels'
+import { user } from 'src/assets'
 import ChannelInfo from 'src/components/ChannelInfo.vue'
 import DialogWrapper from 'src/components/DialogWrapper.vue'
 import NewChannel from 'src/components/NewChannel.vue'
@@ -94,12 +95,19 @@ export default defineComponent({
       leftDrawerOpen: false,
       showInfoDialog: false,
       showNewChannelDialog: false,
+      user,
     }
   },
 
   methods: {
     toggleLeftDrawer() {
       this.leftDrawerOpen = !this.leftDrawerOpen
+    },
+  },
+
+  computed: {
+    fullName(): string {
+      return `${this.user.firstName} ${this.user.lastName}`
     },
   },
 })
