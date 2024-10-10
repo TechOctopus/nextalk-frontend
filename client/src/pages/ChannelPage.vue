@@ -8,7 +8,7 @@
               <q-spinner color="primary" name="dots" size="40px" />
             </div>
           </template>
-          <div v-for="(message, index) in messages" :key="index">
+          <div v-for="(message, index) in messages" :key="index" ref="bottomEls">
             <user-message :message="message" />
           </div>
         </q-infinite-scroll>
@@ -53,6 +53,15 @@ export default defineComponent({
   computed: {
     messages() {
       return this.messageStore.getMessages(this.channel?.id ?? '')
+    },
+  },
+
+  watch: {
+    messages: {
+      async handler() {
+        this.messageStore.messagesRefs = this.$refs.bottomEls as HTMLElement[]
+      },
+      deep: true,
     },
   },
 })
