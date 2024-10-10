@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { Message } from 'src/types'
-import { messagesFor1, messagesFor2, messagesFor3 } from 'src/assets'
+import { messagesFor1, messagesFor2, messagesFor3, user } from 'src/assets'
 
 export type Messages = {
   [channelId: string]: {
@@ -25,6 +25,7 @@ export const useMessageStore = defineStore('messages', {
         offset: 0,
       },
     } as Messages,
+    messagesRefs: [] as HTMLElement[],
   }),
 
   getters: {
@@ -46,6 +47,18 @@ export const useMessageStore = defineStore('messages', {
       this.messages[channelId].offset += newMessages.length
 
       return false
+    },
+
+    sendMessage(channelId: string, message: string) {
+      this.messages[channelId].messages.push({
+        user,
+        text: message,
+        stamp: new Date().toLocaleTimeString(),
+        mentions: [],
+        createdAt: new Date().toISOString(),
+      })
+
+      this.messages[channelId].messages.sort((a, b) => (a.typing === true ? 1 : b.typing === true ? -1 : 0))
     },
   },
 })

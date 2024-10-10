@@ -52,18 +52,7 @@
       </q-page-container>
 
       <q-footer>
-        <q-toolbar class="bg-secondary text-black row">
-          <q-input
-            rounded
-            outlined
-            dense
-            class="WAL__field col-grow q-mr-sm"
-            bg-color="white"
-            v-model="message"
-            placeholder="Type a message"
-          />
-          <q-btn round flat icon="send" />
-        </q-toolbar>
+        <command-line />
       </q-footer>
     </q-layout>
   </div>
@@ -77,12 +66,14 @@ import ChannelInfo from 'src/components/ChannelInfo.vue'
 import DialogWrapper from 'src/components/DialogWrapper.vue'
 import NewChannel from 'src/components/NewChannel.vue'
 import ChannelsList from 'src/components/ChannelsList.vue'
+import CommandLine from 'src/components/CommandLine.vue'
 import UserStatus from 'src/components/UserStatus.vue'
 
 export default defineComponent({
   name: 'ChannelLayout',
 
   components: {
+    CommandLine,
     DialogWrapper,
     ChannelInfo,
     NewChannel,
@@ -93,7 +84,6 @@ export default defineComponent({
   data() {
     return {
       channelsStore: useChannelStore(),
-      message: '',
       leftDrawerOpen: false,
       showInfoDialog: false,
       showNewChannelDialog: false,
