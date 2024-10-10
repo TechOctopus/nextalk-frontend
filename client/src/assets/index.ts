@@ -39,7 +39,7 @@ export const members = [
     firstName: 'Jane',
     lastName: 'Doe',
     email: 'jane@gmail.com',
-    status: 'do-not-disturb',
+    status: 'dnd',
     createdAt: '2024-10-02',
   },
 ] as User[]

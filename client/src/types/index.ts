@@ -13,7 +13,7 @@ export type User = {
   firstName: string
   lastName: string
   email: string
-  status: string
+  status: 'online' | 'offline' | 'dnd'
   createdAt: string
   updatedAt?: string
 }
