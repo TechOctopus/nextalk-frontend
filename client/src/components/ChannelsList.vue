@@ -30,6 +30,9 @@
         <q-item-section side>
           <q-icon v-if="channel.isPrivate" name="lock" />
         </q-item-section>
+        <q-item-section side top>
+          <q-badge v-if="channel.status === 'invite'"> invited </q-badge>
+        </q-item-section>
       </q-item>
     </q-list>
   </q-scroll-area>
