@@ -34,7 +34,7 @@
                 <q-item clickable @click="showNewChannelDialog = true">
                   <q-item-section>New channel</q-item-section>
                 </q-item>
-                <q-item clickable>
+                <q-item clickable to="/login">
                   <q-item-section>Logout</q-item-section>
                 </q-item>
               </q-list>
