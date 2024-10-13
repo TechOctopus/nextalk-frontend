@@ -11,6 +11,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/ChannelLayout.vue'),
     children: [
       { path: '', name: 'nochannels', component: () => import('pages/ChooseChannelPage.vue') },
+      { path: 'settings', name: 'settings', component: () => import('pages/SettingsPage.vue') },
       { path: ':name', name: 'channels', component: () => import('pages/ChannelPage.vue') },
     ],
   },
