@@ -1,6 +1,9 @@
 <template>
   <q-form @submit.stop="sendMessage">
     <q-toolbar class="bg-secondary text-black row">
+      <template v-if="isCommand">
+        <q-chip label="Command:" />
+      </template>
       <q-input
         rounded
         outlined
@@ -9,6 +12,7 @@
         bg-color="white"
         v-model="message"
         placeholder="Type a message"
+        ref="commandLineInput"
       />
       <q-btn round flat icon="send" type="submit" />
     </q-toolbar>
@@ -19,8 +23,8 @@
 import { defineComponent, nextTick } from 'vue'
 import { useQuasar } from 'quasar'
 
-import { useChannelStore } from 'src/stores/channels'
 import { useMessageStore } from 'src/stores/messages'
+import { isCommand, send } from 'src/services/commands'
 
 export default defineComponent({
   name: 'CommandLine',
@@ -28,7 +32,6 @@ export default defineComponent({
   data() {
     return {
       message: '',
-      channelsStore: useChannelStore(),
       messagesStore: useMessageStore(),
       q$: useQuasar(),
     }
@@ -36,26 +39,30 @@ export default defineComponent({
 
   methods: {
     async sendMessage() {
-      if (!this.channelsStore.currentChannel?.id) {
+      try {
+        send(this.message)
+        this.message = ''
+        await nextTick().then(() => {
+          const lastMessage = (this.messagesStore.messagesRefs || []).slice(-1)[0]
+          if (lastMessage) {
+            lastMessage.scrollIntoView({ behavior: 'smooth' })
+          }
+          ;(this.$refs.commandLineInput as HTMLInputElement).focus()
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
         this.q$.notify({
-          message: 'Select a channel first',
+          message: e.message,
           color: 'negative',
           position: 'top',
         })
-        return
       }
-      if (!this.message.trim()) {
-        return
-      }
-      this.messagesStore.sendMessage(this.channelsStore.currentChannel.id, this.message)
-      this.message = ''
+    },
+  },
 
-      await nextTick().then(() => {
-        const lastMessage = (this.messagesStore.messagesRefs || []).slice(-1)[0]
-        if (lastMessage) {
-          lastMessage.scrollIntoView({ behavior: 'smooth' })
-        }
-      })
+  computed: {
+    isCommand() {
+      return isCommand(this.message)
     },
   },
 })
