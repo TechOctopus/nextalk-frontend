@@ -13,7 +13,7 @@ export default boot(({ router }) => {
       channelsStore.resetCurrentChannel()
       return next({ name: 'nochannels' })
     }
-    if (to && to.name === 'nochannels') {
+    if (to && (to.name === 'nochannels' || to.name === 'settings')) {
       channelsStore.resetCurrentChannel()
     }
     next()

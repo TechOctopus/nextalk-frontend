@@ -9,6 +9,7 @@ export const admin = {
   lastName: 'Davydau',
   email: 'xdavydau@stuba.sk',
   status: 'online',
+  notifications: 'enabled',
   createdAt: '2024-10-02',
 } as User
 
@@ -19,6 +20,7 @@ export const user = {
   lastName: 'Gurin',
   email: 'artemii@gmail.com',
   status: 'online',
+  notifications: 'enabled',
   createdAt: '2024-10-02',
 } as User
 
@@ -31,6 +33,7 @@ export const members = [
     lastName: 'Doe',
     email: 'johnny@gmail.com',
     status: 'offline',
+    notifications: 'enabled',
     createdAt: '2024-10-02',
   },
   {
@@ -40,6 +43,7 @@ export const members = [
     lastName: 'Doe',
     email: 'jane@gmail.com',
     status: 'dnd',
+    notifications: 'disabled',
     createdAt: '2024-10-02',
   },
 ] as User[]

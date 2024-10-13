@@ -6,7 +6,7 @@
       <q-header elevated>
         <q-toolbar class="WAL__toolbar">
           <q-btn round flat icon="keyboard_arrow_left" class="WAL__drawer-open q-mr-sm" @click="toggleLeftDrawer" />
-          <span class="q-subtitle-1 q-pl-md">{{ channelsStore.currentChannel?.name ?? 'No channel selected' }}</span>
+          <span class="q-subtitle-1 q-pl-md">{{ channelsStore.currentChannel?.name }}</span>
           <q-space />
           <template v-if="channelsStore.currentChannel">
             <q-btn round flat icon="info" @click="showInfoDialog = true" />
@@ -36,6 +36,9 @@
                 </q-item>
                 <q-item clickable to="/login">
                   <q-item-section>Logout</q-item-section>
+                </q-item>
+                <q-item clickable to="/channels/settings">
+                  <q-item-section>Settings</q-item-section>
                 </q-item>
               </q-list>
             </q-menu>
