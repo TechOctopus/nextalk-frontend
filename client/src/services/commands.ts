@@ -1,8 +1,16 @@
 import { useChannelStore } from 'src/stores/channels'
 import { useMessageStore } from 'src/stores/messages'
+import { useMembersStore } from 'src/stores/members'
+
+import { Notify } from 'quasar'
+
+import { Channel } from 'src/types'
+import { incrementChannelId } from 'src/assets'
+import { router } from 'src/router'
 
 const channelStore = useChannelStore()
 const messageStore = useMessageStore()
+const membersStore = useMembersStore()
 
 export const COMMAND_SYMBOL = '/'
 
@@ -21,31 +29,82 @@ export type Command = {
 }
 
 function joinChannel(name: string, isPrivate: boolean) {
-  console.log('Joining channel:', name, isPrivate)
+  const newChannel: Channel = {
+    id: incrementChannelId(),
+    name,
+    isPrivate,
+    createdAt: new Date().toISOString(),
+    status: 'join',
+  }
+
+  channelStore.addChannel(newChannel)
+  channelStore.setCurrentChannel(name)
+  router.push(`/channels/${name}`)
+
+  Notify.create({
+    message: `Joined the channel ${name}`,
+    color: 'positive',
+    position: 'top',
+  })
 }
 
 function inviteUser(userName: string, channelId: string) {
-  console.log('Inviting user:', userName, channelId)
+  const channelName = channelStore.channels.find((channel) => channel.id === channelId)?.name
+
+  Notify.create({
+    message: `Invited ${userName} to the channel ${channelName}`,
+    color: 'positive',
+    position: 'top',
+  })
 }
 
 function revokeUser(userName: string, channelId: string) {
-  console.log('Revoking user:', userName, channelId)
+  const channelName = channelStore.channels.find((channel) => channel.id === channelId)?.name
+
+  Notify.create({
+    message: `Revoked ${userName} from the channel ${channelName}`,
+    color: 'warning',
+    position: 'top',
+  })
 }
 
 function kickUser(userName: string, channelId: string) {
-  console.log('Kicking user:', userName, channelId)
+  const channelName = channelStore.channels.find((channel) => channel.id === channelId)?.name
+
+  Notify.create({
+    message: `Kicked ${userName} from the channel ${channelName}`,
+    color: 'negative',
+    position: 'top',
+  })
 }
 
 function quitChannel(channelId: string) {
-  console.log('Quitting channel:', channelId)
+  channelStore.resetCurrentChannel()
+  channelStore.removeChannel(channelId)
+  router.push('/channels/')
+
+  Notify.create({
+    message: 'Quitted the channel',
+    color: 'negative',
+    position: 'top',
+  })
 }
 
 function cancelChannel(channelId: string) {
-  console.log('Cancelling channel:', channelId)
+  channelStore.resetCurrentChannel()
+  channelStore.removeChannel(channelId)
+  router.push('/channels/')
+
+  Notify.create({
+    message: 'Left the channel',
+    color: 'negative',
+    position: 'top',
+  })
 }
 
 function listMembers(channelId: string) {
-  console.log('Listing members:', channelId)
+  console.info('listMembers', channelId)
+  membersStore.membersDialog = true
 }
 
 function createCommand(
@@ -104,8 +163,6 @@ export const allCommands: Command[] = [
 function sendCommand(message: string) {
   const [commandName, ...args] = message.trim().split(' ')
   const commandDescription = allCommands.find((cmd) => `${COMMAND_SYMBOL}${cmd.commandName}` === commandName)
-
-  console.log('Command:', commandDescription)
 
   if (!commandDescription) throw new Error('Invalid command')
   if (commandDescription.requireChannel && !channelStore.currentChannel) throw new Error('No channel selected')

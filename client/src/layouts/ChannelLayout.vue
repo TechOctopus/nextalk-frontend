@@ -9,9 +9,9 @@
           <span class="q-subtitle-1 q-pl-md">{{ channelsStore.currentChannel?.name }}</span>
           <q-space />
           <template v-if="channelsStore.currentChannel">
-            <q-btn round flat icon="info" @click="showInfoDialog = true" />
-            <dialog-wrapper v-model="showInfoDialog" title="Channel info">
-              <channel-info @close="showInfoDialog = false" />
+            <q-btn round flat icon="info" @click="membersStore.membersDialog = true" />
+            <dialog-wrapper v-model="membersStore.membersDialog" title="Channel info">
+              <channel-info @close="membersStore.membersDialog = false" />
             </dialog-wrapper>
           </template>
         </q-toolbar>
@@ -64,6 +64,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useChannelStore } from 'src/stores/channels'
+import { useMembersStore } from 'src/stores/members'
 
 import ChannelInfo from 'src/components/ChannelInfo.vue'
 import DialogWrapper from 'src/components/DialogWrapper.vue'
@@ -88,7 +89,7 @@ export default defineComponent({
     return {
       channelsStore: useChannelStore(),
       leftDrawerOpen: false,
-      showInfoDialog: false,
+      membersStore: useMembersStore(),
       showNewChannelDialog: false,
     }
   },
