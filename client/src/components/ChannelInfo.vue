@@ -1,0 +1,78 @@
+<template>
+  <div style="width: 100%">
+    <q-list>
+      <q-item>
+        <q-item-section>
+          <q-item-label lines="1">{{ fullName(admin) }}</q-item-label>
+          <q-item-label caption lines="2">{{ admin.status }}</q-item-label>
+        </q-item-section>
+        <q-item-section side>
+          <q-badge label="admin" color="teal" />
+        </q-item-section>
+      </q-item>
+
+      <q-item v-for="member in members" :key="member.id">
+        <q-item-section>
+          <q-item-label lines="1">{{ fullName(member) }}</q-item-label>
+          <q-item-label caption lines="2">{{ member.status }}</q-item-label>
+        </q-item-section>
+        <q-item-section top side>
+          <q-btn class="gt-xs" size="12px" flat dense round icon="delete" />
+        </q-item-section>
+      </q-item>
+
+      <q-item-label header>Add member</q-item-label>
+      <q-item-section class="q-mx-md">
+        <q-form class="full-width" style="display: flex; gap: 10px">
+          <q-input v-model="form.newMember" label="Username" class="full-width" outlined dense />
+          <q-btn label="Add" color="primary" />
+        </q-form>
+      </q-item-section>
+
+      <template v-if="isAdmin">
+        <q-item-label header>Delete channel</q-item-label>
+        <q-item-section class="q-mx-md">
+          <q-item-label class="q-pb-md">Deleting the channel will remove all messages and members</q-item-label>
+          <q-btn label="Delete channel" color="negative" outline />
+        </q-item-section>
+      </template>
+      <template v-else>
+        <q-item-label header>Leave channel</q-item-label>
+        <q-item-section class="q-mx-md">
+          <q-btn label="Leave channel" color="negative" outline />
+        </q-item-section>
+      </template>
+    </q-list>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent } from 'vue'
+import type { User } from 'src/types'
+
+import { admin, members } from 'src/assets'
+
+export default defineComponent({
+  name: 'ChannelInfo',
+
+  data() {
+    return {
+      admin,
+      members,
+      form: { newMember: '' },
+    }
+  },
+
+  methods: {
+    fullName(user: User) {
+      return `${user.firstName} ${user.lastName}`
+    },
+  },
+
+  computed: {
+    isAdmin() {
+      return true
+    },
+  },
+})
+</script>
