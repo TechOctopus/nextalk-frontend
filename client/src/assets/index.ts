@@ -48,23 +48,29 @@ export const members = [
   },
 ] as User[]
 
+let channelId = 1
+
+export const incrementChannelId = () => {
+  return `${channelId++}`
+}
+
 export const channels = [
   {
-    id: '1',
+    id: incrementChannelId(),
     name: 'fiit',
     isPrivate: false,
     createdAt: '2024-10-01',
     status: 'join',
   },
   {
-    id: '2',
+    id: incrementChannelId(),
     name: 'vpwa',
     isPrivate: false,
     createdAt: '2024-08-01',
     status: 'invite',
   },
   {
-    id: '3',
+    id: incrementChannelId(),
     name: 'nextalk',
     isPrivate: true,
     createdAt: '2024-09-01',

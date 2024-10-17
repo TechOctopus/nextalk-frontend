@@ -50,6 +50,13 @@ export const useMessageStore = defineStore('messages', {
     },
 
     sendMessage(channelId: string, message: string) {
+      if (this.messages[channelId] === undefined) {
+        this.messages[channelId] = {
+          messages: [],
+          offset: 0,
+        }
+      }
+
       this.messages[channelId].messages.push({
         user,
         text: message,
