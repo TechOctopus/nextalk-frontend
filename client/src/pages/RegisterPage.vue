@@ -102,10 +102,12 @@ export default defineComponent({
     }
   },
   validations() {
+    // Size limits are based on the UK government's GDS Catalogue
+    // https://webarchive.nationalarchives.gov.uk/ukgwa/+/http://www.cabinetoffice.gov.uk/media/254290/GDS%20Catalogue%20Vol%202.pdf
     return {
       formData: {
-        firstName: { required, minLength: minLength(3), maxLength: maxLength(20) },
-        lastName: { required, minLength: minLength(3), maxLength: maxLength(20) },
+        firstName: { required, minLength: minLength(3), maxLength: maxLength(35) },
+        lastName: { required, minLength: minLength(3), maxLength: maxLength(35) },
         email: { required, emailValidator },
         username: { required, minLength: minLength(3), maxLength: maxLength(20) },
         password: { required, minLength: minLength(8), maxLength: maxLength(16) },

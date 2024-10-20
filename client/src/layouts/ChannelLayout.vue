@@ -6,11 +6,11 @@
       <q-header elevated>
         <q-toolbar class="WAL__toolbar">
           <q-btn round flat icon="keyboard_arrow_left" class="WAL__drawer-open q-mr-sm" @click="toggleLeftDrawer" />
-          <span class="q-subtitle-1 q-pl-md">{{ channelsStore.currentChannel?.name }}</span>
+          <span class="q-subtitle-1 q-pl-md ellipsis">{{ channelsStore.currentChannel?.name }}</span>
           <q-space />
           <template v-if="channelsStore.currentChannel">
             <q-btn round flat icon="info" @click="membersStore.membersDialog = true" />
-            <dialog-wrapper v-model="membersStore.membersDialog" title="Channel info">
+            <dialog-wrapper v-model="membersStore.membersDialog" title="Channel info" maxWidth="400px">
               <channel-info @close="membersStore.membersDialog = false" />
             </dialog-wrapper>
           </template>

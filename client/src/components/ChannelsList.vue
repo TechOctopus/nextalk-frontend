@@ -8,7 +8,7 @@
   </q-toolbar>
 
   <q-scroll-area style="height: calc(100% - 100px)">
-    <q-list>
+    <q-list style="width: 300px">
       <q-item v-if="channels.length === 0">
         <p class="text-center">No channels found</p>
       </q-item>
@@ -20,7 +20,7 @@
         v-ripple
       >
         <q-item-section>
-          <q-item-label lines="1">
+          <q-item-label lines="1" class="ellipsis">
             {{ channel.name }}
           </q-item-label>
           <q-item-label class="conversation__summary" caption>

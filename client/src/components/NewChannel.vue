@@ -38,6 +38,8 @@ import { defineComponent } from 'vue'
 import useVuelidate from '@vuelidate/core'
 import { minLength, maxLength, required } from '@vuelidate/validators'
 
+import { joinChannel } from 'src/services/commands'
+
 export default defineComponent({
   name: 'NewChannel',
 
@@ -57,7 +59,7 @@ export default defineComponent({
         name: {
           required,
           minLength: minLength(3),
-          maxLength: maxLength(30),
+          maxLength: maxLength(14),
         },
         isPrivate: {
           required,
@@ -68,6 +70,7 @@ export default defineComponent({
 
   methods: {
     handleCreateChannel() {
+      joinChannel(this.formData.name, this.formData.isPrivate)
       this.$emit('close')
     },
   },
