@@ -28,7 +28,21 @@ export type Command = {
   args?: CommandArgument[]
 }
 
-function joinChannel(name: string, isPrivate: boolean) {
+export function joinChannel(name: string, isPrivate: boolean) {
+  if (name.length < 3 || name.length > 14) {
+    Notify.create({
+      message: 'Channel name must be between 3 and 14 characters',
+      color: 'negative',
+      position: 'top',
+    })
+    return
+  }
+
+  if (channelStore.channels.find((channel) => channel.name === name)) {
+    router.push(`/channels/${name}`)
+    return
+  }
+
   const newChannel: Channel = {
     id: incrementChannelId(),
     name,
@@ -197,6 +211,15 @@ export function isCommand(message: string) {
 
 export function send(message: string) {
   if (message.trim() === '') {
+    return
+  }
+
+  if (message.length > 120) {
+    Notify.create({
+      message: 'Message is too long',
+      color: 'negative',
+      position: 'top',
+    })
     return
   }
 

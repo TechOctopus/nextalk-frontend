@@ -2,7 +2,19 @@
   <q-form @submit.stop="sendMessage">
     <q-toolbar class="bg-secondary text-black row">
       <template v-if="isCommand">
-        <q-chip label="Command:" />
+        <q-btn
+          label="Command:"
+          flat
+          dense
+          class="q-mr-sm q-pa-sm"
+          style="background: #dadada"
+          rounded
+          no-caps
+          @click="showCommandsHelpDialog = true"
+        />
+        <dialog-wrapper v-model="showCommandsHelpDialog" title="Commands Help" maxWidth="400px">
+          <commands-help />
+        </dialog-wrapper>
       </template>
       <q-input
         rounded
@@ -23,15 +35,24 @@
 import { defineComponent, nextTick } from 'vue'
 import { useQuasar } from 'quasar'
 
+import DialogWrapper from 'src/components/DialogWrapper.vue'
+import CommandsHelp from 'src/components/CommandsHelp.vue'
+
 import { useMessageStore } from 'src/stores/messages'
 import { isCommand, send } from 'src/services/commands'
 
 export default defineComponent({
   name: 'CommandLine',
 
+  components: {
+    DialogWrapper,
+    CommandsHelp,
+  },
+
   data() {
     return {
       message: '',
+      showCommandsHelpDialog: false,
       messagesStore: useMessageStore(),
       q$: useQuasar(),
     }
