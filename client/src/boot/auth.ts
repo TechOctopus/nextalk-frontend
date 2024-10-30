@@ -17,7 +17,7 @@ export default boot(({ router, store }) => {
       }
     } else if (to.matched.some((record) => !record.meta.requiresAuth)) {
       if (isAuthenticated) {
-        return next({ name: 'channels' })
+        return next({ name: 'nochannels' })
       }
     }
     next()
