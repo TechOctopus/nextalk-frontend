@@ -8,6 +8,7 @@ const routes: RouteRecordRaw[] = [
 
   {
     path: '/channels',
+    meta: { requiresAuth: true },
     component: () => import('layouts/ChannelLayout.vue'),
     children: [
       { path: '', name: 'nochannels', component: () => import('pages/ChooseChannelPage.vue') },

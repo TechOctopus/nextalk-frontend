@@ -34,7 +34,7 @@
                 <q-item clickable @click="showNewChannelDialog = true">
                   <q-item-section>New channel</q-item-section>
                 </q-item>
-                <q-item clickable to="/login">
+                <q-item clickable @click="logout">
                   <q-item-section>Logout</q-item-section>
                 </q-item>
                 <q-item clickable to="/channels/settings">
@@ -62,9 +62,12 @@
 </template>
 
 <script lang="ts">
+import { useRouter } from 'vue-router'
+
 import { defineComponent } from 'vue'
 import { useChannelStore } from 'src/stores/channels'
 import { useMembersStore } from 'src/stores/members'
+import { useAuthStore } from 'src/stores/auth'
 
 import ChannelInfo from 'src/components/ChannelInfo.vue'
 import DialogWrapper from 'src/components/DialogWrapper.vue'
@@ -87,16 +90,23 @@ export default defineComponent({
 
   data() {
     return {
-      channelsStore: useChannelStore(),
       leftDrawerOpen: false,
-      membersStore: useMembersStore(),
       showNewChannelDialog: false,
+      router: useRouter(),
+      authStore: useAuthStore(),
+      membersStore: useMembersStore(),
+      channelsStore: useChannelStore(),
     }
   },
 
   methods: {
     toggleLeftDrawer() {
       this.leftDrawerOpen = !this.leftDrawerOpen
+    },
+
+    async logout() {
+      await this.authStore.logout()
+      this.router.push('/login')
     },
   },
 })

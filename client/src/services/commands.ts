@@ -4,7 +4,7 @@ import { useMembersStore } from 'src/stores/members'
 
 import { Notify } from 'quasar'
 
-import { Channel } from 'src/types'
+import { Channel } from 'src/contracts'
 import { incrementChannelId } from 'src/assets'
 import { router } from 'src/router'
 

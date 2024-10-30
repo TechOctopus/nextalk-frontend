@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { Channel } from 'src/types'
+import type { Channel } from 'src/contracts'
 
 import { channels } from 'src/assets'
 

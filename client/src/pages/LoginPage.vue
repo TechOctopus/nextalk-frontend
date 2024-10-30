@@ -44,6 +44,7 @@ import { useQuasar } from 'quasar'
 import useVuelidate from '@vuelidate/core'
 import { useRouter } from 'vue-router'
 import { minLength, maxLength, required, email as emailValidator } from '@vuelidate/validators'
+import { useAuthStore } from 'src/stores/auth'
 
 export default defineComponent({
   name: 'LoginPage',
@@ -58,6 +59,7 @@ export default defineComponent({
         password: '',
       },
       loading: false,
+      authStore: useAuthStore(),
     }
   },
   validations() {
@@ -77,6 +79,14 @@ export default defineComponent({
         this.loading = false
         return
       }
+
+      const response = await this.authStore.login(this.formData)
+      if (response.error) {
+        this.q$.notify({ message: response.message, color: 'negative', position: 'top' })
+        this.loading = false
+        return
+      }
+
       this.loading = false
       this.router.push('/channels')
     },
