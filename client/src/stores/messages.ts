@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { Message } from 'src/types'
+import { Message } from 'src/contracts'
 import { messagesFor1, messagesFor2, messagesFor3, user } from 'src/assets'
 
 export type Messages = {

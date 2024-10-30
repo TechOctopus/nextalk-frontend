@@ -1,6 +1,6 @@
 // Data for preview purposes
 
-import { User, Channel, Message } from 'src/types'
+import { User, Channel, Message } from 'src/contracts'
 
 export const admin = {
   id: '1',

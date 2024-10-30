@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { UserStatus } from 'src/types'
+import type { UserStatus } from 'src/contracts'
 
 import { user } from 'src/assets'
 

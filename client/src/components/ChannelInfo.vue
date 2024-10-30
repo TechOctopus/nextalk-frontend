@@ -48,7 +48,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import type { User } from 'src/types'
+import type { User } from 'src/contracts'
 
 import { admin, members } from 'src/assets'
 

@@ -24,7 +24,7 @@ import { defineComponent } from 'vue'
 import type { PropType } from 'vue'
 
 import { user } from 'src/assets'
-import type { Message } from 'src/types'
+import type { Message } from 'src/contracts'
 
 export default defineComponent({
   name: 'UserMessage',
