@@ -61,7 +61,7 @@ export default defineComponent({
   methods: {
     async sendMessage() {
       try {
-        send(this.message)
+        await send(this.message)
         this.message = ''
         await nextTick().then(() => {
           const lastMessage = (this.messagesStore.messagesRefs || []).slice(-1)[0]

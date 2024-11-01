@@ -1,11 +1,9 @@
 import { defineStore } from 'pinia'
 import type { Channel } from 'src/contracts'
 
-import { channels } from 'src/assets'
-
 export const useChannelStore = defineStore('channels', {
   state: () => ({
-    channels,
+    channels: [] as Channel[],
     currentChannel: undefined as Channel | undefined,
   }),
 
@@ -26,6 +24,11 @@ export const useChannelStore = defineStore('channels', {
 
     addChannel(channel: Channel) {
       this.channels.push(channel)
+    },
+
+    initChannels(channels: Channel[]) {
+      this.currentChannel = channels[0] || undefined
+      this.channels = channels
     },
 
     removeChannel(channelId: string) {

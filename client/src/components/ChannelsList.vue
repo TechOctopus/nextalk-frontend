@@ -43,6 +43,8 @@ import { defineComponent } from 'vue'
 import { useChannelStore } from 'src/stores/channels'
 import { useRouter } from 'vue-router'
 
+import { humanDate } from 'src/utils/index'
+
 export default defineComponent({
   name: 'ChannelsList',
 
@@ -67,6 +69,10 @@ export default defineComponent({
         .filter((channel) => channel.name.toLowerCase().includes(this.search.toLowerCase()))
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
         .sort((a, b) => (b.status === 'invite' ? 1 : 0) - (a.status === 'invite' ? 1 : 0))
+        .map((channel) => ({
+          ...channel,
+          createdAt: humanDate(channel.createdAt),
+        }))
     },
   },
 })
