@@ -76,6 +76,7 @@ import CommandLine from 'src/components/CommandLine.vue'
 import UserStatus from 'src/components/UserStatus.vue'
 
 import { authService } from 'src/services/auth'
+import { channelService } from 'src/services/channels'
 
 export default defineComponent({
   name: 'ChannelLayout',
@@ -108,6 +109,10 @@ export default defineComponent({
       await authService.logout()
       this.router.push('/login')
     },
+  },
+
+  created() {
+    channelService.load()
   },
 })
 </script>

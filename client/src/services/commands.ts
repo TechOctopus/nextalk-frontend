@@ -3,10 +3,9 @@ import { useMessageStore } from 'src/stores/messages'
 import { useMembersStore } from 'src/stores/members'
 
 import { Notify } from 'quasar'
-
-import { Channel } from 'src/contracts'
-import { incrementChannelId } from 'src/assets'
 import { router } from 'src/router'
+
+import { joinChannel, quitChannel, ApiResponse } from 'src/utils/api'
 
 const channelStore = useChannelStore()
 const messageStore = useMessageStore()
@@ -24,42 +23,8 @@ export type Command = {
   commandName: string
   description: string
   requireChannel: boolean
-  execute: (...args: string[]) => void
+  execute: (...args: string[]) => Promise<ApiResponse | void>
   args?: CommandArgument[]
-}
-
-export function joinChannel(name: string, isPrivate: boolean) {
-  if (name.length < 3 || name.length > 14) {
-    Notify.create({
-      message: 'Channel name must be between 3 and 14 characters',
-      color: 'negative',
-      position: 'top',
-    })
-    return
-  }
-
-  if (channelStore.channels.find((channel) => channel.name === name)) {
-    router.push(`/channels/${name}`)
-    return
-  }
-
-  const newChannel: Channel = {
-    id: incrementChannelId(),
-    name,
-    isPrivate,
-    createdAt: new Date().toISOString(),
-    status: 'join',
-  }
-
-  channelStore.addChannel(newChannel)
-  channelStore.setCurrentChannel(name)
-  router.push(`/channels/${name}`)
-
-  Notify.create({
-    message: `Joined the channel ${name}`,
-    color: 'positive',
-    position: 'top',
-  })
 }
 
 function inviteUser(userName: string, channelId: string) {
@@ -92,18 +57,6 @@ function kickUser(userName: string, channelId: string) {
   })
 }
 
-function quitChannel(channelId: string) {
-  channelStore.resetCurrentChannel()
-  channelStore.removeChannel(channelId)
-  router.push('/channels/')
-
-  Notify.create({
-    message: 'Quitted the channel',
-    color: 'negative',
-    position: 'top',
-  })
-}
-
 function cancelChannel(channelId: string) {
   channelStore.resetCurrentChannel()
   channelStore.removeChannel(channelId)
@@ -125,7 +78,7 @@ function createCommand(
   commandName: string,
   description: string,
   requireChannel: boolean,
-  execute: (...args: string[]) => void,
+  execute: (...args: string[]) => Promise<ApiResponse | void>,
   args: CommandArgument[] = [],
 ): Command {
   return {
@@ -142,7 +95,7 @@ export const allCommands: Command[] = [
     'join',
     'Join a channel, argument: ChannelName, optional: Private',
     false,
-    (name: string, isPrivate = 'false') => joinChannel(name, isPrivate === 'private'),
+    async (name: string, isPrivate = 'false') => await joinChannel(name, isPrivate === 'private'),
     [
       { name: 'channelName', required: true },
       { name: 'private', required: false, value: 'private' },
@@ -152,29 +105,29 @@ export const allCommands: Command[] = [
     'invite',
     'Invite a user to the channel, argument: UserName',
     true,
-    (userName: string, channelId: string) => inviteUser(userName, channelId),
+    async (userName: string, channelId: string) => inviteUser(userName, channelId),
     [{ name: 'userName', required: true }],
   ),
   createCommand(
     'revoke',
     'Revoke a user from the channel, argument: UserName',
     true,
-    (userName: string, channelId: string) => revokeUser(userName, channelId),
+    async (userName: string, channelId: string) => revokeUser(userName, channelId),
     [{ name: 'userName', required: true }],
   ),
   createCommand(
     'kick',
     'Kick a user from the channel, argument: UserName',
     true,
-    (userName: string, channelId: string) => kickUser(userName, channelId),
+    async (userName: string, channelId: string) => kickUser(userName, channelId),
     [{ name: 'userName', required: true }],
   ),
-  createCommand('quit', 'Quit the channel', true, (channelId: string) => quitChannel(channelId)),
-  createCommand('cancel', 'Cancel the current operation', true, (channelId: string) => cancelChannel(channelId)),
-  createCommand('list', 'List all users in the channel', true, (channelId: string) => listMembers(channelId)),
+  createCommand('quit', 'Quit the channel', true, async (id: string) => await quitChannel(id)),
+  createCommand('cancel', 'Cancel the current operation', true, async (channelId: string) => cancelChannel(channelId)),
+  createCommand('list', 'List all users in the channel', true, async (channelId: string) => listMembers(channelId)),
 ]
 
-function sendCommand(message: string) {
+async function sendCommand(message: string) {
   const [commandName, ...args] = message.trim().split(' ')
   const commandDescription = allCommands.find((cmd) => `${COMMAND_SYMBOL}${cmd.commandName}` === commandName)
 
@@ -182,7 +135,7 @@ function sendCommand(message: string) {
   if (commandDescription.requireChannel && !channelStore.currentChannel) throw new Error('No channel selected')
   else if (commandDescription.requireChannel && channelStore.currentChannel) args.push(channelStore.currentChannel.id)
 
-  if (commandDescription.args) {
+  if (commandDescription.args?.length) {
     if (args.length < commandDescription.args.filter((arg) => arg.required).length) {
       throw new Error('Missing required arguments')
     }
@@ -192,9 +145,11 @@ function sendCommand(message: string) {
         throw new Error('Invalid argument value')
       }
     })
+  } else if (args.length > 1) {
+    throw new Error('Command does not accept arguments')
   }
 
-  commandDescription.execute(...args)
+  await commandDescription.execute(...args)
 }
 
 function sendMessage(message: string) {
@@ -209,7 +164,7 @@ export function isCommand(message: string) {
   return message.startsWith(COMMAND_SYMBOL)
 }
 
-export function send(message: string) {
+export async function send(message: string) {
   if (message.trim() === '') {
     return
   }
@@ -223,5 +178,9 @@ export function send(message: string) {
     return
   }
 
-  isCommand(message) ? sendCommand(message) : sendMessage(message)
+  if (isCommand(message)) {
+    await sendCommand(message)
+  } else {
+    sendMessage(message)
+  }
 }

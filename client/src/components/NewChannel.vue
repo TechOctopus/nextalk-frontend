@@ -38,7 +38,7 @@ import { defineComponent } from 'vue'
 import useVuelidate from '@vuelidate/core'
 import { minLength, maxLength, required } from '@vuelidate/validators'
 
-import { joinChannel } from 'src/services/commands'
+import { joinChannel } from 'src/utils/api'
 
 export default defineComponent({
   name: 'NewChannel',
