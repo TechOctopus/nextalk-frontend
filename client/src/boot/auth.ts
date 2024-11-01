@@ -1,5 +1,5 @@
 import { boot } from 'quasar/wrappers'
-import { useAuthStore } from 'src/stores/auth'
+import { authService } from 'src/services/auth'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -7,10 +7,10 @@ declare module 'vue-router' {
   }
 }
 
-export default boot(({ router, store }) => {
+export default boot(({ router }) => {
   router.beforeEach(async (to, from, next) => {
-    const authStore = useAuthStore(store)
-    const isAuthenticated = await authStore.checkAuthentication()
+    const isAuthenticated = await authService.checkAuth()
+
     if (to.matched.some((record) => record.meta.requiresAuth)) {
       if (!isAuthenticated) {
         return next({ name: 'login' })

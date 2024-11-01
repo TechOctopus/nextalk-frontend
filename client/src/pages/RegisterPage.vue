@@ -81,7 +81,7 @@ import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
 import useVuelidate from '@vuelidate/core'
 import { minLength, maxLength, required, email as emailValidator, sameAs } from '@vuelidate/validators'
-import { useAuthStore } from 'src/stores/auth'
+import { authService } from 'src/services/auth'
 
 export default defineComponent({
   name: 'RegisterPage',
@@ -100,7 +100,6 @@ export default defineComponent({
       q$: useQuasar(),
       router: useRouter(),
       loading: false,
-      authStore: useAuthStore(),
     }
   },
   validations() {
@@ -127,7 +126,7 @@ export default defineComponent({
         return
       }
 
-      const response = await this.authStore.register(this.formData)
+      const response = await authService.register(this.formData)
       if (response.error) {
         this.q$.notify({ message: response.message, color: 'negative', position: 'top' })
         this.loading = false
