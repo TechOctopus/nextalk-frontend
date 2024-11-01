@@ -37,7 +37,7 @@
             <q-item-label caption>Everyone can see you</q-item-label>
           </q-item-section>
           <q-item-section side top>
-            <q-icon v-if="userStore.user.status === 'online'" name="check" />
+            <q-icon v-if="userStore.user?.status === 'online'" name="check" />
           </q-item-section>
         </q-item>
         <q-item clickable @click="userStore.setUserStatus('offline')">
@@ -49,7 +49,7 @@
             <q-item-label caption>You will appear offline</q-item-label>
           </q-item-section>
           <q-item-section side top>
-            <q-icon v-if="userStore.user.status === 'offline'" name="check" />
+            <q-icon v-if="userStore.user?.status === 'offline'" name="check" />
           </q-item-section>
         </q-item>
         <q-item clickable @click="userStore.setUserStatus('dnd')">
@@ -61,7 +61,7 @@
             <q-item-label caption>You will appear offline and receive no notifications</q-item-label>
           </q-item-section>
           <q-item-section side top>
-            <q-icon v-if="userStore.user.status === 'dnd'" name="check" />
+            <q-icon v-if="userStore.user?.status === 'dnd'" name="check" />
           </q-item-section>
         </q-item>
       </q-list>
@@ -87,28 +87,32 @@ export default defineComponent({
   computed: {
     notification: {
       get() {
-        return this.user.notifications === 'enabled' || this.user.notifications === 'mentions'
+        return this.user?.notifications === 'enabled' || this.user?.notifications === 'mentions'
       },
       set(value: boolean) {
-        this.user.notifications = value ? 'enabled' : 'disabled'
+        if (this.user?.notifications) {
+          this.user.notifications = value ? 'enabled' : 'disabled'
+        }
       },
     },
 
     notificationMentions: {
       get() {
-        return this.user.notifications === 'mentions'
+        return this.user?.notifications === 'mentions'
       },
       set(value: boolean) {
-        this.user.notifications = value ? 'mentions' : 'enabled'
+        if (this.user?.notifications) {
+          this.user.notifications = value ? 'mentions' : 'enabled'
+        }
       },
     },
 
     isNotificationDisabled() {
-      return this.user.status === 'dnd'
+      return this.user?.status === 'dnd'
     },
 
     isNotificationMentionsDisabled() {
-      return this.user.notifications === 'disabled'
+      return this.user?.notifications === 'disabled'
     },
   },
 })

@@ -1,15 +1,18 @@
 import { defineStore } from 'pinia'
-import type { UserStatus } from 'src/contracts'
-
-import { user } from 'src/assets'
+import type { UserStatus, User } from 'src/contracts'
 
 export const useUserStore = defineStore('user', {
-  state: () => ({
-    user,
-  }),
+  state: () =>
+    ({
+      user: null,
+    }) as {
+      user: User | null
+    },
 
   getters: {
     getFullName(): string {
+      if (!this.user) return ''
+
       let { firstName, lastName } = this.user
       if (`${firstName} ${lastName}`.length > 22) {
         if (firstName.length > 8) {
@@ -24,7 +27,12 @@ export const useUserStore = defineStore('user', {
   },
 
   actions: {
+    setUser(user: User | null) {
+      this.user = user
+    },
+
     setUserStatus(status: UserStatus) {
+      if (!this.user) return
       if (status === 'dnd') {
         this.user.notifications = 'disabled'
       } else {

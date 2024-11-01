@@ -45,7 +45,7 @@ export default defineComponent({
 
   computed: {
     userStatusIcon(): string {
-      switch (this.userStore.user.status) {
+      switch (this.userStore.user?.status) {
         case 'online':
           return 'circle'
         case 'offline':
@@ -58,7 +58,7 @@ export default defineComponent({
     },
 
     userStatusIconColor(): string {
-      switch (this.userStore.user.status) {
+      switch (this.userStore.user?.status) {
         case 'online':
           return 'green'
         case 'offline':
