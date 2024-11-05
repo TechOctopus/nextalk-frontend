@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
-import type { UserStatus, User } from 'src/contracts'
+import type { UserStatus, User, RegisterData, LoginCredentials } from 'src/contracts'
+import { authService, authManager } from 'src/services'
 
-export const useUserStore = defineStore('user', {
+export const useAuthStore = defineStore('auth', {
   state: () =>
     ({
       user: null,
@@ -27,6 +28,28 @@ export const useUserStore = defineStore('user', {
   },
 
   actions: {
+    async check() {
+      this.user = await authService.me()
+      return this.user !== null
+    },
+
+    async register(form: RegisterData) {
+      this.user = await authService.register(form)
+      return this.user
+    },
+    async login(credentials: LoginCredentials) {
+      const apiToken = await authService.login(credentials)
+      // save api token to local storage and notify listeners
+      authManager.setToken(apiToken.token)
+      return apiToken
+    },
+
+    async logout() {
+      await authService.logout()
+      // remove api token and notify listeners
+      authManager.removeToken()
+    },
+
     setUser(user: User | null) {
       this.user = user
     },

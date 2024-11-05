@@ -13,7 +13,7 @@
 import { defineComponent } from 'vue'
 import type { PropType } from 'vue'
 
-import { useUserStore } from 'src/stores/user'
+import { useAuthStore } from 'src/stores'
 
 import type { Message } from 'src/contracts'
 
@@ -22,7 +22,7 @@ export default defineComponent({
 
   data() {
     return {
-      userStore: useUserStore(),
+      authStore: useAuthStore(),
     }
   },
 
@@ -35,11 +35,11 @@ export default defineComponent({
 
   computed: {
     isSent(): boolean {
-      return this.message.user.id === this.userStore.user?.id
+      return this.message.user.id === this.authStore.user?.id
     },
 
     isMention(): boolean {
-      return this.message.mentions?.some((mention) => mention.id === this.userStore.user?.id) ?? false
+      return this.message.mentions?.some((mention) => mention.id === this.authStore.user?.id) ?? false
     },
 
     fullUserName(): string {

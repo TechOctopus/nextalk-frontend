@@ -75,7 +75,7 @@ import ChannelsList from 'src/components/ChannelsList.vue'
 import CommandLine from 'src/components/CommandLine.vue'
 import UserStatus from 'src/components/UserStatus.vue'
 
-import { authService } from 'src/services/auth'
+import { authService } from 'src/services'
 import { channelService } from 'src/services/channels'
 
 export default defineComponent({

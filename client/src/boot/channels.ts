@@ -1,8 +1,8 @@
 import { boot } from 'quasar/wrappers'
 import { useChannelStore } from 'src/stores/channels'
 
-export default boot(({ router }) => {
-  const channelsStore = useChannelStore()
+export default boot(({ router, store }) => {
+  const channelsStore = useChannelStore(store)
   router.beforeEach(async (to, from, next) => {
     if (to && to.name === 'channels') {
       const channelName = to.params.name as string
