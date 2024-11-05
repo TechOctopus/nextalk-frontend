@@ -24,6 +24,7 @@ export const useChannelStore = defineStore('channels', {
 
     addChannel(channel: Channel) {
       this.channels.push(channel)
+      this.currentChannel = channel
     },
 
     initChannels(channels: Channel[]) {
@@ -31,11 +32,12 @@ export const useChannelStore = defineStore('channels', {
       this.channels = channels
     },
 
-    removeChannel(channelId: string) {
+    deleteChannel(channelId: string) {
       const index = this.channels.findIndex((channel) => channel.id === channelId)
       if (index !== -1) {
         this.channels.splice(index, 1)
       }
+      this.currentChannel = undefined
     },
   },
 })

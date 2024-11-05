@@ -59,7 +59,7 @@ function kickUser(userName: string, channelId: string) {
 
 function cancelChannel(channelId: string) {
   channelStore.resetCurrentChannel()
-  channelStore.removeChannel(channelId)
+  channelStore.deleteChannel(channelId)
   router.push('/channels/')
 
   Notify.create({
