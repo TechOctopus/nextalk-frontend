@@ -1,15 +1,5 @@
 <template>
-  <q-chat-message v-if="message.typing" :name="fullUserName">
-    <q-btn flat dense style="width: 100%; height: 2rem">
-      <q-spinner-dots />
-      <q-menu fit auto-close>
-        <p class="message_typing">
-          {{ messageTyping }}
-        </p>
-      </q-menu>
-    </q-btn>
-  </q-chat-message>
-  <q-chat-message v-else :name="fullUserName" :sent="isSent" :stamp="message.stamp">
+  <q-chat-message :name="fullUserName" :sent="isSent" :stamp="message.stamp">
     <div>
       <q-badge v-if="isMention" rounded color="orange" floating>
         <q-icon name="person" />
@@ -23,7 +13,8 @@
 import { defineComponent } from 'vue'
 import type { PropType } from 'vue'
 
-import { user } from 'src/assets'
+import { useUserStore } from 'src/stores/user'
+
 import type { Message } from 'src/contracts'
 
 export default defineComponent({
@@ -31,8 +22,7 @@ export default defineComponent({
 
   data() {
     return {
-      messageTyping: '',
-      messageTypingDestroy: null as (() => void) | null,
+      userStore: useUserStore(),
     }
   },
 
@@ -43,43 +33,18 @@ export default defineComponent({
     },
   },
 
-  methods: {
-    simulateTyping() {
-      let index = 1
-
-      const intervalId = setInterval(() => {
-        this.messageTyping = this.message.text.slice(0, index++)
-        if (index > this.message.text.length) {
-          index = 1
-        }
-      }, 250)
-
-      return () => clearInterval(intervalId)
-    },
-  },
-
   computed: {
     isSent(): boolean {
-      return this.message.user.id === user.id
+      return this.message.user.id === this.userStore.user?.id
     },
 
     isMention(): boolean {
-      return this.message.mentions?.some((mention) => mention.id === user.id) ?? false
+      return this.message.mentions?.some((mention) => mention.id === this.userStore.user?.id) ?? false
     },
 
     fullUserName(): string {
       return `${this.message.user.firstName} ${this.message.user.lastName}`
     },
-  },
-
-  mounted() {
-    this.messageTypingDestroy = this.simulateTyping()
-  },
-
-  beforeUnmount() {
-    if (this.messageTypingDestroy) {
-      this.messageTypingDestroy()
-    }
   },
 })
 </script>
@@ -87,12 +52,5 @@ export default defineComponent({
 <style lang="scss">
 .mention {
   color: blue;
-}
-
-.message_typing {
-  margin: 0;
-  padding: 0.5rem;
-  font-size: 0.8rem;
-  color: #9e9e9e;
 }
 </style>

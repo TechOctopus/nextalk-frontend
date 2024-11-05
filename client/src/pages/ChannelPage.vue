@@ -21,6 +21,9 @@
 import { defineComponent } from 'vue'
 import { useMessageStore } from 'src/stores/messages'
 import { useChannelStore } from 'src/stores/channels'
+
+import { messageService } from 'src/services/messages'
+
 import UserMessage from 'src/components/UserMessage.vue'
 
 export default defineComponent({
@@ -38,15 +41,8 @@ export default defineComponent({
   },
 
   methods: {
-    loadMore(index: number, done: (stop: boolean) => void) {
-      if (this.channel?.id !== '1') {
-        done(true)
-        return
-      }
-
-      setTimeout(() => {
-        done(this.messageStore.loadMore(this.channel?.id ?? ''))
-      }, 1000)
+    async loadMore(index: number, done: (stop: boolean) => void) {
+      done(await messageService.load(this.channel?.id ?? ''))
     },
   },
 
