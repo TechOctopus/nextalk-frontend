@@ -1,14 +1,14 @@
 import { useChannelStore } from 'src/stores/channels'
-import { useMessageStore } from 'src/stores/messages'
 import { useMembersStore } from 'src/stores/members'
 
 import { Notify } from 'quasar'
 import { router } from 'src/router'
 
+import { messageService } from 'src/services/messages'
+
 import { joinChannel, quitChannel, ApiResponse } from 'src/utils/api'
 
 const channelStore = useChannelStore()
-const messageStore = useMessageStore()
 const membersStore = useMembersStore()
 
 export const COMMAND_SYMBOL = '/'
@@ -152,12 +152,12 @@ async function sendCommand(message: string) {
   await commandDescription.execute(...args)
 }
 
-function sendMessage(message: string) {
+async function sendMessage(message: string) {
   if (!channelStore.currentChannel?.id) {
     throw new Error('No channel selected')
   }
 
-  messageStore.sendMessage(channelStore.currentChannel.id, message)
+  await messageService.sendMessage(channelStore.currentChannel.id, message)
 }
 
 export function isCommand(message: string) {
@@ -181,6 +181,6 @@ export async function send(message: string) {
   if (isCommand(message)) {
     await sendCommand(message)
   } else {
-    sendMessage(message)
+    await sendMessage(message)
   }
 }
