@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import NewChannel from 'src/components/NewChannel.vue'
+import { NewChannel } from 'src/components'
 
 export default defineComponent({
   name: 'ChooseChannelPage',

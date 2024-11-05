@@ -68,12 +68,7 @@ import { defineComponent } from 'vue'
 import { useChannelStore } from 'src/stores/channels'
 import { useMembersStore } from 'src/stores/members'
 
-import ChannelInfo from 'src/components/ChannelInfo.vue'
-import DialogWrapper from 'src/components/DialogWrapper.vue'
-import NewChannel from 'src/components/NewChannel.vue'
-import ChannelsList from 'src/components/ChannelsList.vue'
-import CommandLine from 'src/components/CommandLine.vue'
-import UserStatus from 'src/components/UserStatus.vue'
+import { ChannelInfo, DialogWrapper, NewChannel, ChannelsList, CommandLine, UserStatus } from 'src/components'
 
 import { authService } from 'src/services'
 import { channelService } from 'src/services/channels'

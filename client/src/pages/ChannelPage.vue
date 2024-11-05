@@ -24,7 +24,7 @@ import { useChannelStore } from 'src/stores/channels'
 
 import { messageService } from 'src/services/messages'
 
-import UserMessage from 'src/components/UserMessage.vue'
+import { UserMessage } from 'src/components'
 
 export default defineComponent({
   name: 'ChannelPage',

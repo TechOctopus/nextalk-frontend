@@ -35,8 +35,7 @@
 import { defineComponent, nextTick } from 'vue'
 import { useQuasar } from 'quasar'
 
-import DialogWrapper from 'src/components/DialogWrapper.vue'
-import CommandsHelp from 'src/components/CommandsHelp.vue'
+import { DialogWrapper, CommandsHelp } from 'src/components'
 
 import { useMessageStore } from 'src/stores/messages'
 import { isCommand, send } from 'src/services/commands'
