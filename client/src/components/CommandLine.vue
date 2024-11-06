@@ -35,10 +35,11 @@
 import { defineComponent, nextTick } from 'vue'
 import { useQuasar } from 'quasar'
 
-import { DialogWrapper, CommandsHelp } from 'src/components'
+import DialogWrapper from 'src/components/DialogWrapper.vue'
+import CommandsHelp from 'src/components/CommandsHelp.vue'
 
-import { useMessageStore } from 'src/stores/messages'
-import { isCommand, send } from 'src/services/commands'
+import { useChannelStore } from 'src/stores/channels'
+// import { isCommand, send } from 'src/services/commands'
 
 export default defineComponent({
   name: 'CommandLine',
@@ -52,7 +53,7 @@ export default defineComponent({
     return {
       message: '',
       showCommandsHelpDialog: false,
-      messagesStore: useMessageStore(),
+      channelStore: useChannelStore(),
       q$: useQuasar(),
     }
   },
@@ -60,15 +61,15 @@ export default defineComponent({
   methods: {
     async sendMessage() {
       try {
-        await send(this.message)
+        this.channelStore.addMessage(this.channelStore.active ?? '', this.message)
         this.message = ''
-        await nextTick().then(() => {
-          const lastMessage = (this.messagesStore.messagesRefs || []).slice(-1)[0]
-          if (lastMessage) {
-            lastMessage.scrollIntoView({ behavior: 'smooth' })
-          }
-          ;(this.$refs.commandLineInput as HTMLInputElement).focus()
-        })
+        // await nextTick().then(() => {
+        //   const lastMessage = (this.messagesStore.messagesRefs || []).slice(-1)[0]
+        //   if (lastMessage) {
+        //     lastMessage.scrollIntoView({ behavior: 'smooth' })
+        //   }
+        //   ;(this.$refs.commandLineInput as HTMLInputElement).focus()
+        // })
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         this.q$.notify({
@@ -82,7 +83,7 @@ export default defineComponent({
 
   computed: {
     isCommand() {
-      return isCommand(this.message)
+      return false
     },
   },
 })

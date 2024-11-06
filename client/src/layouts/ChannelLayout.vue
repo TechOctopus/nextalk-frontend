@@ -6,9 +6,9 @@
       <q-header elevated>
         <q-toolbar class="WAL__toolbar">
           <q-btn round flat icon="keyboard_arrow_left" class="WAL__drawer-open q-mr-sm" @click="toggleLeftDrawer" />
-          <span class="q-subtitle-1 q-pl-md ellipsis">{{ channelsStore.currentChannel?.name }}</span>
+          <span class="q-subtitle-1 q-pl-md ellipsis">{{ channelsStore.active }}</span>
           <q-space />
-          <template v-if="channelsStore.currentChannel">
+          <template v-if="channelsStore.active">
             <q-btn round flat icon="info" @click="membersStore.membersDialog = true" />
             <dialog-wrapper v-model="membersStore.membersDialog" title="Channel info" maxWidth="400px">
               <channel-info @close="membersStore.membersDialog = false" />
@@ -51,7 +51,7 @@
       </q-drawer>
 
       <q-page-container class="bg-grey-1">
-        <router-view :key="channelsStore.currentChannel?.id" />
+        <router-view :key="channelsStore.active ?? ''" />
       </q-page-container>
 
       <q-footer>
@@ -68,10 +68,14 @@ import { defineComponent } from 'vue'
 import { useChannelStore } from 'src/stores/channels'
 import { useMembersStore } from 'src/stores/members'
 
-import { ChannelInfo, DialogWrapper, NewChannel, ChannelsList, CommandLine, UserStatus } from 'src/components'
+import ChannelInfo from 'src/components/ChannelInfo.vue'
+import DialogWrapper from 'src/components/DialogWrapper.vue'
+import NewChannel from 'src/components/NewChannel.vue'
+import ChannelsList from 'src/components/ChannelsList.vue'
+import CommandLine from 'src/components/CommandLine.vue'
+import UserStatus from 'src/components/UserStatus.vue'
 
 import { authService } from 'src/services'
-import { channelService } from 'src/services/channels'
 
 export default defineComponent({
   name: 'ChannelLayout',
@@ -104,10 +108,6 @@ export default defineComponent({
       await authService.logout()
       this.router.push('/login')
     },
-  },
-
-  created() {
-    channelService.load()
   },
 })
 </script>

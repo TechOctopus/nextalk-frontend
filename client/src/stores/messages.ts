@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
-import { Message } from 'src/contracts'
+import { SerializedMessage } from 'src/contracts'
 
 export type Messages = {
   [channelId: string]: {
-    messages: Message[]
+    messages: SerializedMessage[]
     offset: number
   }
 }
@@ -32,14 +32,14 @@ export const useMessageStore = defineStore('messages', {
       }
     },
 
-    add(channelId: string, message: Message) {
+    add(channelId: string, message: SerializedMessage) {
       if (!this.messages[channelId]) {
         this.init(channelId)
       }
       this.messages[channelId].messages.push(message)
     },
 
-    update(channelId: string, messages: Message[]) {
+    update(channelId: string, messages: SerializedMessage[]) {
       if (!this.messages[channelId]) {
         this.init(channelId)
       }

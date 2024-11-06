@@ -1,43 +1,64 @@
 import { defineStore } from 'pinia'
-import type { Channel } from 'src/contracts'
+import type { SerializedMessage, RawMessage } from 'src/contracts'
+import { channelService } from 'src/services'
 
 export const useChannelStore = defineStore('channels', {
   state: () => ({
-    channels: [] as Channel[],
-    currentChannel: undefined as Channel | undefined,
+    messages: {} as { [channel: string]: SerializedMessage[] },
+    active: null as string | null,
   }),
 
   getters: {
     getChannelByName: (state) => (name: string) => {
-      return state.channels.find((channel) => channel.name === name)
+      return name in state.messages
+    },
+
+    joinedChannels: (state) => {
+      return Object.keys(state.messages)
+    },
+
+    currentMessages: (state) => {
+      return state.active !== null ? state.messages[state.active] : []
+    },
+
+    lastMessageOf: (state) => {
+      return (channel: string) => {
+        const messages = state.messages[channel]
+        return messages.length > 0 ? messages[messages.length - 1] : null
+      }
     },
   },
 
   actions: {
-    setCurrentChannel(channelName: string) {
-      this.currentChannel = this.getChannelByName(channelName)
+    setCurrentChannel(channel: string) {
+      this.active = channel
     },
 
     resetCurrentChannel() {
-      this.currentChannel = undefined
+      this.active = null
     },
 
-    addChannel(channel: Channel) {
-      this.channels.push(channel)
-      this.currentChannel = channel
+    async join(channel: string) {
+      this.messages[channel] = await channelService.join(channel).loadMessages()
     },
 
-    initChannels(channels: Channel[]) {
-      this.currentChannel = channels[0] || undefined
-      this.channels = channels
+    async leave(channel: string | null) {
+      const leaving: string[] = channel !== null ? [channel] : this.joinedChannels
+
+      leaving.forEach((c) => {
+        channelService.leave(c)
+      })
     },
 
-    deleteChannel(channelId: string) {
-      const index = this.channels.findIndex((channel) => channel.id === channelId)
-      if (index !== -1) {
-        this.channels.splice(index, 1)
+    async newMessage(channel: string, message: SerializedMessage) {
+      this.messages[channel].push(message)
+    },
+
+    async addMessage(channel: string, message: RawMessage) {
+      const newMessage = await channelService.in(channel)?.addMessage(message)
+      if (newMessage) {
+        this.newMessage(channel, newMessage)
       }
-      this.currentChannel = undefined
     },
   },
 })

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import type { UserStatus, User, RegisterData, LoginCredentials } from 'src/contracts'
 import { authService, authManager } from 'src/services'
+import { useChannelStore } from 'src/stores'
 
 export const useAuthStore = defineStore('auth', {
   state: () =>
@@ -29,7 +30,14 @@ export const useAuthStore = defineStore('auth', {
 
   actions: {
     async check() {
-      this.user = await authService.me()
+      const user = await authService.me()
+
+      // join user to general channel - hardcoded for now
+      if (user?.id !== this.user?.id) {
+        await useChannelStore().join('general')
+      }
+
+      this.user = user
       return this.user !== null
     },
 

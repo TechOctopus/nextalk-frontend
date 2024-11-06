@@ -4,7 +4,7 @@
       <q-badge v-if="isMention" rounded color="orange" floating>
         <q-icon name="person" />
       </q-badge>
-      <div v-html="message.text" />
+      <div v-html="message.content" />
     </div>
   </q-chat-message>
 </template>
@@ -15,7 +15,7 @@ import type { PropType } from 'vue'
 
 import { useAuthStore } from 'src/stores'
 
-import type { Message } from 'src/contracts'
+import type { SerializedMessage } from 'src/contracts'
 
 export default defineComponent({
   name: 'UserMessage',
@@ -28,14 +28,14 @@ export default defineComponent({
 
   props: {
     message: {
-      type: Object as PropType<Message>,
+      type: Object as PropType<SerializedMessage>,
       required: true,
     },
   },
 
   computed: {
     isSent(): boolean {
-      return this.message.user.id === this.authStore.user?.id
+      return this.message.author.id === this.authStore.user?.id
     },
 
     isMention(): boolean {
@@ -43,8 +43,12 @@ export default defineComponent({
     },
 
     fullUserName(): string {
-      return `${this.message.user.firstName} ${this.message.user.lastName}`
+      return `${this.message.author.firstName} ${this.message.author.lastName}`
     },
+  },
+
+  mounted() {
+    console.log(this.message)
   },
 })
 </script>
