@@ -1,11 +1,9 @@
 import { defineStore } from 'pinia'
-import { SerializedMessage } from 'src/contracts'
+import { SerializedMessage, RawMessage } from 'src/contracts'
+import { channelService } from 'src/services'
 
 export type Messages = {
-  [channelId: string]: {
-    messages: SerializedMessage[]
-    offset: number
-  }
+  [channel: string]: SerializedMessage[]
 }
 
 export const useMessageStore = defineStore('messages', {
@@ -15,36 +13,25 @@ export const useMessageStore = defineStore('messages', {
   }),
 
   getters: {
-    getMessages: (state) => (channelId: string) => {
-      return state.messages[channelId]?.messages || []
-    },
-
-    getOffset: (state) => (channelId: string) => {
-      return state.messages[channelId]?.offset || 0
+    getMessages: (state) => (channel: string) => {
+      return state.messages[channel] || []
     },
   },
 
   actions: {
-    init(channelId: string) {
-      this.messages[channelId] = {
-        messages: [],
-        offset: 0,
-      }
+    async join(channel: string) {
+      this.messages[channel] = await channelService.join(channel).loadMessages()
     },
 
-    add(channelId: string, message: SerializedMessage) {
-      if (!this.messages[channelId]) {
-        this.init(channelId)
-      }
-      this.messages[channelId].messages.push(message)
+    async newMessage(channel: string, message: SerializedMessage) {
+      this.messages[channel].push(message)
     },
 
-    update(channelId: string, messages: SerializedMessage[]) {
-      if (!this.messages[channelId]) {
-        this.init(channelId)
+    async addMessage(channel: string, message: RawMessage) {
+      const newMessage = await channelService.in(channel)?.addMessage(message)
+      if (newMessage) {
+        this.newMessage(channel, newMessage)
       }
-      this.messages[channelId].offset += messages.length
-      this.messages[channelId].messages.unshift(...messages)
     },
   },
 })

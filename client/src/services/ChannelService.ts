@@ -1,16 +1,14 @@
-import { RawMessage, SerializedMessage } from 'src/contracts'
+import { Channel, RawMessage, SerializedMessage } from 'src/contracts'
 import { SocketManager } from './SocketManager'
+import { useMessageStore } from 'src/stores/messages'
 import { useChannelStore } from 'src/stores/channels'
 
-// creating instance of this class automatically connects to given socket.io namespace
-// subscribe is called with boot params, so you can use it to dispatch actions for socket events
-// you have access to socket.io socket using this.socket
-class ChannelSocketManager extends SocketManager {
+class MessageSocketManager extends SocketManager {
   public subscribe(): void {
     const channel = this.namespace.split('/').pop() as string
 
     this.socket.on('message', (message: SerializedMessage) => {
-      useChannelStore().newMessage(channel, message)
+      useMessageStore().newMessage(channel, message)
     })
   }
 
@@ -23,16 +21,53 @@ class ChannelSocketManager extends SocketManager {
   }
 }
 
-class ChannelService {
-  private channels: Map<string, ChannelSocketManager> = new Map()
+class ChannelScoketManager extends SocketManager {
+  public subscribe(): void {
+    this.socket.on('channel', (channel: Channel) => {
+      useChannelStore().newChannel(channel)
+    })
+  }
 
-  public join(name: string): ChannelSocketManager {
+  public joinChannel(channelName: string, isPrivate: boolean): Promise<Channel> {
+    return this.emitAsync('joinChannel', channelName, isPrivate)
+  }
+
+  public loadChannels(): Promise<Channel[]> {
+    return this.emitAsync('loadChannels')
+  }
+
+  public quitChannel(channelName: string): Promise<void> {
+    return this.emitAsync('quitChannel', channelName)
+  }
+}
+
+class ChannelService {
+  private channels: Map<string, MessageSocketManager> = new Map()
+  private channelManager: ChannelScoketManager
+
+  constructor() {
+    this.channelManager = new ChannelScoketManager('/channels')
+  }
+
+  public async loadChannels(): Promise<Channel[]> {
+    const channels = await this.channelManager.loadChannels()
+    channels.forEach((channel) => {
+      useMessageStore().join(channel.name)
+    })
+    return channels
+  }
+
+  public async addChannel(channelName: string, isPrivate: boolean): Promise<Channel> {
+    return this.channelManager.joinChannel(channelName, isPrivate)
+  }
+
+  public join(name: string): MessageSocketManager {
     if (this.channels.has(name)) {
       throw new Error(`User is already joined in channel "${name}"`)
     }
 
     // connect to given channel namespace
-    const channel = new ChannelSocketManager(`/channels/${name}`)
+    const channel = new MessageSocketManager(`/channels/${name}`)
     this.channels.set(name, channel)
     return channel
   }
@@ -49,7 +84,7 @@ class ChannelService {
     return this.channels.delete(name)
   }
 
-  public in(name: string): ChannelSocketManager | undefined {
+  public in(name: string): MessageSocketManager | undefined {
     return this.channels.get(name)
   }
 }

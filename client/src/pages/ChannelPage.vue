@@ -20,6 +20,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useChannelStore } from 'src/stores/channels'
+import { useMessageStore } from 'src/stores/messages'
 
 import UserMessage from 'src/components/UserMessage.vue'
 
@@ -33,6 +34,7 @@ export default defineComponent({
   data() {
     return {
       channelStore: useChannelStore(),
+      messageStore: useMessageStore(),
     }
   },
 
@@ -44,7 +46,7 @@ export default defineComponent({
 
   computed: {
     messages() {
-      return this.channelStore.currentMessages
+      return this.messageStore.getMessages(this.channelStore.active ?? '')
     },
   },
 

@@ -1,31 +1,20 @@
 import { defineStore } from 'pinia'
-import type { SerializedMessage, RawMessage } from 'src/contracts'
+import type { Channel } from 'src/contracts'
 import { channelService } from 'src/services'
 
 export const useChannelStore = defineStore('channels', {
   state: () => ({
-    messages: {} as { [channel: string]: SerializedMessage[] },
+    channels: [] as Channel[],
     active: null as string | null,
   }),
 
   getters: {
-    getChannelByName: (state) => (name: string) => {
-      return name in state.messages
-    },
-
     joinedChannels: (state) => {
-      return Object.keys(state.messages)
+      return state.channels
     },
 
-    currentMessages: (state) => {
-      return state.active !== null ? state.messages[state.active] : []
-    },
-
-    lastMessageOf: (state) => {
-      return (channel: string) => {
-        const messages = state.messages[channel]
-        return messages.length > 0 ? messages[messages.length - 1] : null
-      }
+    getChannelByName: (state) => (name: string) => {
+      return state.channels.find((c) => c.name === name)
     },
   },
 
@@ -38,27 +27,27 @@ export const useChannelStore = defineStore('channels', {
       this.active = null
     },
 
-    async join(channel: string) {
-      this.messages[channel] = await channelService.join(channel).loadMessages()
+    async loadChannels() {
+      this.channels = await channelService.loadChannels()
+      this.active = this.channels[0].name
     },
 
-    async leave(channel: string | null) {
-      const leaving: string[] = channel !== null ? [channel] : this.joinedChannels
-
-      leaving.forEach((c) => {
-        channelService.leave(c)
-      })
+    async newChannel(channel: Channel) {
+      this.channels.push(channel)
     },
 
-    async newMessage(channel: string, message: SerializedMessage) {
-      this.messages[channel].push(message)
-    },
-
-    async addMessage(channel: string, message: RawMessage) {
-      const newMessage = await channelService.in(channel)?.addMessage(message)
-      if (newMessage) {
-        this.newMessage(channel, newMessage)
+    async addChannel(channelName: string, isPrivate: boolean) {
+      const newChannel = await channelService.addChannel(channelName, isPrivate)
+      if (newChannel) {
+        this.newChannel(newChannel)
       }
     },
+
+    // async leave(channel: string | null) {
+    // const leaving: string[] = channel !== null ? [channel] : this.joinedChannels
+    // leaving.forEach((c) => {
+    //   channelService.leave(c)
+    // })
+    // },
   },
 })

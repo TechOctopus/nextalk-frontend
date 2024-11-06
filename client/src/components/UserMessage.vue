@@ -1,5 +1,5 @@
 <template>
-  <q-chat-message :name="fullUserName" :sent="isSent" :stamp="message.stamp">
+  <q-chat-message :name="fullUserName" :sent="isSent" :stamp="stamp">
     <div>
       <q-badge v-if="isMention" rounded color="orange" floating>
         <q-icon name="person" />
@@ -16,6 +16,7 @@ import type { PropType } from 'vue'
 import { useAuthStore } from 'src/stores'
 
 import type { SerializedMessage } from 'src/contracts'
+import { humanDate } from 'src/utils'
 
 export default defineComponent({
   name: 'UserMessage',
@@ -45,10 +46,10 @@ export default defineComponent({
     fullUserName(): string {
       return `${this.message.author.firstName} ${this.message.author.lastName}`
     },
-  },
 
-  mounted() {
-    console.log(this.message)
+    stamp(): string {
+      return humanDate(this.message.createdAt)
+    },
   },
 })
 </script>

@@ -32,9 +32,8 @@ export const useAuthStore = defineStore('auth', {
     async check() {
       const user = await authService.me()
 
-      // join user to general channel - hardcoded for now
       if (user?.id !== this.user?.id) {
-        await useChannelStore().join('general')
+        await useChannelStore().loadChannels()
       }
 
       this.user = user

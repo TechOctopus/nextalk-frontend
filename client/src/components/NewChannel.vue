@@ -31,7 +31,7 @@ import { defineComponent } from 'vue'
 import useVuelidate from '@vuelidate/core'
 import { minLength, maxLength, required } from '@vuelidate/validators'
 
-import { joinChannel } from 'src/utils/api'
+import { useChannelStore } from 'src/stores'
 
 export default defineComponent({
   name: 'NewChannel',
@@ -43,6 +43,7 @@ export default defineComponent({
         name: '',
         isPrivate: false,
       },
+      useChannelStore: useChannelStore(),
     }
   },
 
@@ -65,7 +66,9 @@ export default defineComponent({
     async handleCreateChannel() {
       const isValid = await this.v$.$validate()
       if (!isValid) return
-      await joinChannel(this.formData.name, this.formData.isPrivate)
+
+      this.useChannelStore.addChannel(this.formData.name, this.formData.isPrivate)
+
       this.$emit('close')
     },
   },
