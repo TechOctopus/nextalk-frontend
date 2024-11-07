@@ -34,6 +34,12 @@ export const useChannelStore = defineStore('channels', {
       }
     },
 
+    async quitChannels() {
+      await channelService.quitChannels(this.channels)
+      this.channels = []
+      this.active = null
+    },
+
     async newChannel(channel: Channel) {
       this.channels.push(channel)
     },

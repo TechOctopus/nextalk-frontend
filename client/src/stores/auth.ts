@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import type { UserStatus, User, RegisterData, LoginCredentials } from 'src/contracts'
 import { authService, authManager } from 'src/services'
-import { useChannelStore } from 'src/stores'
+import { useChannelStore } from 'src/stores/channels'
 
 export const useAuthStore = defineStore('auth', {
   state: () =>
@@ -30,20 +30,14 @@ export const useAuthStore = defineStore('auth', {
 
   actions: {
     async check() {
-      const user = await authService.me()
-
-      if (user?.id !== this.user?.id) {
-        await useChannelStore().loadChannels()
-      }
-
-      this.user = user
+      this.user = await authService.me()
       return this.user !== null
     },
 
     async register(form: RegisterData) {
-      this.user = await authService.register(form)
-      return this.user
+      await authService.register(form)
     },
+
     async login(credentials: LoginCredentials) {
       const apiToken = await authService.login(credentials)
       // save api token to local storage and notify listeners
@@ -55,6 +49,7 @@ export const useAuthStore = defineStore('auth', {
       await authService.logout()
       // remove api token and notify listeners
       authManager.removeToken()
+      await useChannelStore().quitChannels()
     },
 
     setUser(user: User | null) {
