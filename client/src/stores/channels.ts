@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
 import type { Channel } from 'src/contracts'
 import { channelService } from 'src/services'
+import { router } from 'src/router'
 
 export const useChannelStore = defineStore('channels', {
   state: () => ({
     channels: [] as Channel[],
-    active: null as string | null,
+    active: null as Channel | null,
   }),
 
   getters: {
@@ -19,7 +20,11 @@ export const useChannelStore = defineStore('channels', {
   },
 
   actions: {
-    setCurrentChannel(channel: string) {
+    setCurrentChannel(channelName: string) {
+      const channel = this.getChannelByName(channelName)
+      if (!channel) {
+        return
+      }
       this.active = channel
     },
 
@@ -37,8 +42,20 @@ export const useChannelStore = defineStore('channels', {
       this.active = null
     },
 
-    async newChannel(channel: Channel) {
+    newChannel(channel: Channel) {
       this.channels.push(channel)
+    },
+
+    removeChannel(channel: Channel) {
+      const index = this.channels.findIndex((c) => c.id === channel.id)
+      if (index !== -1) {
+        this.channels.splice(index, 1)
+      }
+
+      if (this.active?.id === channel.id) {
+        this.active = null
+        router.push('/channels')
+      }
     },
 
     async addChannel(channelName: string, isPrivate: boolean) {
@@ -46,6 +63,22 @@ export const useChannelStore = defineStore('channels', {
       if (newChannel) {
         this.newChannel(newChannel)
       }
+    },
+
+    async inviteUser(userName: string, channelId: string) {
+      await channelService.inviteUser(userName, channelId)
+    },
+
+    async revokeUser(userName: string, channelId: string) {
+      await channelService.revokeUser(userName, channelId)
+    },
+
+    async quitChannel(channelId: string) {
+      await channelService.quitChannel(channelId)
+    },
+
+    async cancelChannel(channelId: string) {
+      await channelService.cancelChannel(channelId)
     },
   },
 })

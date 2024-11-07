@@ -47,7 +47,7 @@ export default defineComponent({
 
   computed: {
     messages() {
-      return this.messageStore.getMessages(this.channelStore.active ?? '')
+      return this.messageStore.getMessages(this.channelStore.active?.name ?? '')
     },
   },
 
