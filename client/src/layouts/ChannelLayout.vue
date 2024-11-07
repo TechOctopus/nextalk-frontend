@@ -67,6 +67,7 @@ import { useRouter } from 'vue-router'
 import { defineComponent } from 'vue'
 import { useChannelStore } from 'src/stores/channels'
 import { useMembersStore } from 'src/stores/members'
+import { useAuthStore } from 'src/stores/auth'
 
 import ChannelInfo from 'src/components/ChannelInfo.vue'
 import DialogWrapper from 'src/components/DialogWrapper.vue'
@@ -74,8 +75,6 @@ import NewChannel from 'src/components/NewChannel.vue'
 import ChannelsList from 'src/components/ChannelsList.vue'
 import CommandLine from 'src/components/CommandLine.vue'
 import UserStatus from 'src/components/UserStatus.vue'
-
-import { authService } from 'src/services'
 
 export default defineComponent({
   name: 'ChannelLayout',
@@ -96,6 +95,7 @@ export default defineComponent({
       router: useRouter(),
       membersStore: useMembersStore(),
       channelsStore: useChannelStore(),
+      authStore: useAuthStore(),
     }
   },
 
@@ -105,9 +105,13 @@ export default defineComponent({
     },
 
     async logout() {
-      await authService.logout()
+      await this.authStore.logout()
       this.router.push('/login')
     },
+  },
+
+  mounted() {
+    this.channelsStore.loadChannels()
   },
 })
 </script>

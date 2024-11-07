@@ -16,9 +16,8 @@ class AuthService {
       })
   }
 
-  async register(data: RegisterData): Promise<User> {
-    const response = await api.post<User>('auth/register', data)
-    return response.data
+  async register(data: RegisterData): Promise<void> {
+    await api.post<User>('auth/register', data)
   }
 
   async login(credentials: LoginCredentials): Promise<ApiToken> {

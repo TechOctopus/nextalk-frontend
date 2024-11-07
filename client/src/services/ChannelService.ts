@@ -43,13 +43,11 @@ class ChannelScoketManager extends SocketManager {
 
 class ChannelService {
   private channels: Map<string, MessageSocketManager> = new Map()
-  private channelManager: ChannelScoketManager
-
-  constructor() {
-    this.channelManager = new ChannelScoketManager('/channels')
-  }
+  private channelManager: ChannelScoketManager | null = null
 
   public async loadChannels(): Promise<Channel[]> {
+    this.channelManager = new ChannelScoketManager('/channels')
+
     const channels = await this.channelManager.loadChannels()
     channels.forEach((channel) => {
       useMessageStore().join(channel.name)
@@ -57,7 +55,22 @@ class ChannelService {
     return channels
   }
 
+  public async quitChannels(channls: Channel[]): Promise<void> {
+    if (!this.channelManager) {
+      throw new Error('Channel manager is not initialized')
+    }
+
+    channls.forEach((channel) => {
+      useMessageStore().leave(channel.name)
+    })
+
+    this.channelManager = null
+  }
+
   public async addChannel(channelName: string, isPrivate: boolean): Promise<Channel> {
+    if (!this.channelManager) {
+      throw new Error('Channel manager is not initialized')
+    }
     const newChannel = this.channelManager.joinChannel(channelName, isPrivate)
     useMessageStore().join(channelName)
     return newChannel

@@ -23,6 +23,11 @@ export const useMessageStore = defineStore('messages', {
       this.messages[channel] = await channelService.join(channel).loadMessages()
     },
 
+    async leave(channel: string) {
+      delete this.messages[channel]
+      channelService.leave(channel)
+    },
+
     async newMessage(channel: string, message: SerializedMessage) {
       this.messages[channel].push(message)
     },
