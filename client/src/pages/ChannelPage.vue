@@ -8,9 +8,10 @@
               <q-spinner color="primary" name="dots" size="40px" />
             </div>
           </template>
-          <div v-for="(message, index) in messages" :key="index" ref="bottomEls">
+          <div v-for="(message, index) in messages" :key="index">
             <user-message :message="message" />
           </div>
+          <div ref="bottom"></div>
         </q-infinite-scroll>
       </div>
     </div>
@@ -50,13 +51,8 @@ export default defineComponent({
     },
   },
 
-  // watch: {
-  //   messages: {
-  //     async handler() {
-  //       this.messageStore.messagesRefs = this.$refs.bottomEls as HTMLElement[]
-  //     },
-  //     deep: true,
-  //   },
-  // },
+  mounted() {
+    this.messageStore.scrollArea = this.$refs.bottom as HTMLElement
+  },
 })
 </script>

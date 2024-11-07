@@ -1,17 +1,10 @@
-// import { useChannelStore } from 'src/stores/channels'
-// import { useMembersStore } from 'src/stores/members'
+import { useChannelStore } from 'src/stores/channels'
+import { useMessageStore } from 'src/stores/messages'
 
-// import { Notify } from 'quasar'
 // import { router } from 'src/router'
-
-// import { messageService } from 'src/services/messages'
-
-// import { joinChannel, quitChannel, ApiResponse } from 'src/utils/api'
 
 // const channelStore = useChannelStore()
 // const membersStore = useMembersStore()
-
-// export const COMMAND_SYMBOL = '/'
 
 // export type CommandArgument = {
 //   name: string
@@ -23,7 +16,7 @@
 //   commandName: string
 //   description: string
 //   requireChannel: boolean
-//   execute: (...args: string[]) => Promise<ApiResponse | void>
+//   execute: (...args: string[]) => Promise<void>
 //   args?: CommandArgument[]
 // }
 
@@ -160,29 +153,42 @@
 //   await messageService.sendMessage(channelStore.currentChannel.id, message)
 // }
 
-// export function isCommand(message: string) {
-//   return message.startsWith(COMMAND_SYMBOL)
-// }
+class CommandService {
+  private COMMAND_SYMBOL = '/'
 
-// export async function send(message: string) {
-//   if (message.trim() === '') {
-//     return
-//   }
+  public isCommand(message: string) {
+    return message.startsWith(this.COMMAND_SYMBOL)
+  }
 
-//   if (message.length > 120) {
-//     Notify.create({
-//       message: 'Message is too long',
-//       color: 'negative',
-//       position: 'top',
-//     })
-//     return
-//   }
+  private async sendCommand(message: string) {
+    console.log('sendCommand', message)
+  }
 
-//   if (isCommand(message)) {
-//     await sendCommand(message)
-//   } else {
-//     await sendMessage(message)
-//   }
-// }
+  private async sendMessage(message: string) {
+    const channelName = useChannelStore().active
 
-export {}
+    if (!channelName) {
+      throw new Error('No channel selected')
+    }
+
+    useMessageStore().addMessage(channelName, message)
+  }
+
+  public async send(message: string) {
+    if (message.trim() === '') {
+      throw new Error('Message is empty')
+    }
+
+    if (message.length > 120) {
+      throw new Error('Message is too long')
+    }
+
+    if (this.isCommand(message)) {
+      await this.sendCommand(message)
+    } else {
+      await this.sendMessage(message)
+    }
+  }
+}
+
+export default new CommandService()
