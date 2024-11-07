@@ -3,6 +3,8 @@ import { SocketManager } from './SocketManager'
 import { useMessageStore } from 'src/stores/messages'
 import { useChannelStore } from 'src/stores/channels'
 
+import { Notify } from 'quasar'
+
 class MessageSocketManager extends SocketManager {
   public subscribe(): void {
     const channel = this.namespace.split('/').pop() as string
@@ -26,6 +28,46 @@ class ChannelScoketManager extends SocketManager {
     this.socket.on('channel', (channel: Channel) => {
       useChannelStore().newChannel(channel)
     })
+
+    this.socket.on('invite', (channel: Channel) => {
+      useChannelStore().newChannel(channel)
+      useMessageStore().join(channel.name)
+      Notify.create({
+        message: `You have been invited to channel ${channel.name}`,
+        position: 'top',
+        color: 'primary',
+      })
+    })
+
+    this.socket.on('revoke', (channel: Channel) => {
+      useChannelStore().removeChannel(channel)
+      useMessageStore().leave(channel.name)
+      Notify.create({
+        message: `You have been revoked from channel ${channel.name}`,
+        position: 'top',
+        color: 'warning',
+      })
+    })
+
+    this.socket.on('quit', (channel: Channel) => {
+      useChannelStore().removeChannel(channel)
+      useMessageStore().leave(channel.name)
+      Notify.create({
+        message: `Channel ${channel.name} has been deleted`,
+        position: 'top',
+        color: 'negative',
+      })
+    })
+
+    this.socket.on('cancel', (channel: Channel) => {
+      useChannelStore().removeChannel(channel)
+      useMessageStore().leave(channel.name)
+      Notify.create({
+        message: `Channel ${channel.name} has been canceled`,
+        position: 'top',
+        color: 'info',
+      })
+    })
   }
 
   public joinChannel(channelName: string, isPrivate: boolean): Promise<Channel> {
@@ -36,8 +78,20 @@ class ChannelScoketManager extends SocketManager {
     return this.emitAsync('loadChannels')
   }
 
-  public quitChannel(channelName: string): Promise<void> {
-    return this.emitAsync('quitChannel', channelName)
+  public quitChannel(channelId: string): Promise<void> {
+    return this.emitAsync('quitChannel', channelId)
+  }
+
+  public inviteUser(userName: string, channelId: string): Promise<void> {
+    return this.emitAsync('inviteUser', userName, channelId)
+  }
+
+  public revokeUser(userName: string, channelId: string): Promise<void> {
+    return this.emitAsync('revokeUser', userName, channelId)
+  }
+
+  public cancelChannel(channelId: string): Promise<void> {
+    return this.emitAsync('cancelChannel', channelId)
   }
 }
 
@@ -77,6 +131,34 @@ class ChannelService {
     const newChannel = this.channelManager.joinChannel(channelName, isPrivate)
     useMessageStore().join(channelName)
     return newChannel
+  }
+
+  public async inviteUser(userName: string, channelId: string): Promise<void> {
+    if (!this.channelManager) {
+      throw new Error('Channel manager is not initialized')
+    }
+    await this.channelManager.inviteUser(userName, channelId)
+  }
+
+  public async revokeUser(userName: string, channelId: string): Promise<void> {
+    if (!this.channelManager) {
+      throw new Error('Channel manager is not initialized')
+    }
+    await this.channelManager.revokeUser(userName, channelId)
+  }
+
+  public async quitChannel(channelId: string): Promise<void> {
+    if (!this.channelManager) {
+      throw new Error('Channel manager is not initialized')
+    }
+    return this.channelManager.quitChannel(channelId)
+  }
+
+  public async cancelChannel(channelId: string): Promise<void> {
+    if (!this.channelManager) {
+      throw new Error('Channel manager is not initialized')
+    }
+    await this.channelManager.cancelChannel(channelId)
   }
 
   public join(name: string): MessageSocketManager {

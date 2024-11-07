@@ -6,7 +6,7 @@
       <q-header elevated>
         <q-toolbar class="WAL__toolbar">
           <q-btn round flat icon="keyboard_arrow_left" class="WAL__drawer-open q-mr-sm" @click="toggleLeftDrawer" />
-          <span class="q-subtitle-1 q-pl-md ellipsis">{{ channelsStore.active }}</span>
+          <span class="q-subtitle-1 q-pl-md ellipsis">{{ channelsStore.active?.name }}</span>
           <q-space />
           <template v-if="channelsStore.active">
             <q-btn round flat icon="info" @click="membersStore.membersDialog = true" />
@@ -51,7 +51,7 @@
       </q-drawer>
 
       <q-page-container class="bg-grey-1">
-        <router-view :key="channelsStore.active ?? ''" />
+        <router-view :key="channelsStore.active?.name ?? ''" />
       </q-page-container>
 
       <q-footer>
