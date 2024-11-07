@@ -2,6 +2,10 @@ import { store } from 'quasar/wrappers'
 import { createPinia } from 'pinia'
 import { Router } from 'vue-router'
 
+import { useAuthStore } from './auth'
+import { useChannelStore } from './channels'
+import { useMessageStore } from './messages'
+
 /*
  * When adding new properties to stores, you should also
  * extend the `PiniaCustomProperties` interface.
@@ -30,3 +34,5 @@ export default store((/* { ssrContext } */) => {
 
   return pinia
 })
+
+export { useAuthStore, useChannelStore, useMessageStore }

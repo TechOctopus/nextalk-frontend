@@ -1,43 +1,55 @@
 import { defineStore } from 'pinia'
 import type { Channel } from 'src/contracts'
+import { channelService } from 'src/services'
 
 export const useChannelStore = defineStore('channels', {
   state: () => ({
     channels: [] as Channel[],
-    currentChannel: undefined as Channel | undefined,
+    active: null as string | null,
   }),
 
   getters: {
+    joinedChannels: (state) => {
+      return state.channels
+    },
+
     getChannelByName: (state) => (name: string) => {
-      return state.channels.find((channel) => channel.name === name)
+      return state.channels.find((c) => c.name === name)
     },
   },
 
   actions: {
-    setCurrentChannel(channelName: string) {
-      this.currentChannel = this.getChannelByName(channelName)
+    setCurrentChannel(channel: string) {
+      this.active = channel
     },
 
     resetCurrentChannel() {
-      this.currentChannel = undefined
+      this.active = null
     },
 
-    addChannel(channel: Channel) {
-      this.channels.push(channel)
-      this.currentChannel = channel
-    },
-
-    initChannels(channels: Channel[]) {
-      this.currentChannel = channels[0] || undefined
-      this.channels = channels
-    },
-
-    deleteChannel(channelId: string) {
-      const index = this.channels.findIndex((channel) => channel.id === channelId)
-      if (index !== -1) {
-        this.channels.splice(index, 1)
+    async loadChannels() {
+      this.channels = await channelService.loadChannels()
+      if (this.channels.length > 0) {
+        this.active = this.channels[0].name
       }
-      this.currentChannel = undefined
     },
+
+    async newChannel(channel: Channel) {
+      this.channels.push(channel)
+    },
+
+    async addChannel(channelName: string, isPrivate: boolean) {
+      const newChannel = await channelService.addChannel(channelName, isPrivate)
+      if (newChannel) {
+        this.newChannel(newChannel)
+      }
+    },
+
+    // async leave(channel: string | null) {
+    // const leaving: string[] = channel !== null ? [channel] : this.joinedChannels
+    // leaving.forEach((c) => {
+    //   channelService.leave(c)
+    // })
+    // },
   },
 })

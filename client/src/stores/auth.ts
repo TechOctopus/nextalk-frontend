@@ -1,0 +1,74 @@
+import { defineStore } from 'pinia'
+import type { UserStatus, User, RegisterData, LoginCredentials } from 'src/contracts'
+import { authService, authManager } from 'src/services'
+import { useChannelStore } from 'src/stores'
+
+export const useAuthStore = defineStore('auth', {
+  state: () =>
+    ({
+      user: null,
+    }) as {
+      user: User | null
+    },
+
+  getters: {
+    getFullName(): string {
+      if (!this.user) return ''
+
+      let { firstName, lastName } = this.user
+      if (`${firstName} ${lastName}`.length > 22) {
+        if (firstName.length > 8) {
+          firstName = `${firstName.slice(0, 8)}...`
+        }
+        if (lastName.length > 8) {
+          lastName = `${lastName.slice(0, 8)}...`
+        }
+      }
+      return `${firstName} ${lastName}`
+    },
+  },
+
+  actions: {
+    async check() {
+      const user = await authService.me()
+
+      if (user?.id !== this.user?.id) {
+        await useChannelStore().loadChannels()
+      }
+
+      this.user = user
+      return this.user !== null
+    },
+
+    async register(form: RegisterData) {
+      this.user = await authService.register(form)
+      return this.user
+    },
+    async login(credentials: LoginCredentials) {
+      const apiToken = await authService.login(credentials)
+      // save api token to local storage and notify listeners
+      authManager.setToken(apiToken.token)
+      return apiToken
+    },
+
+    async logout() {
+      await authService.logout()
+      // remove api token and notify listeners
+      authManager.removeToken()
+    },
+
+    setUser(user: User | null) {
+      this.user = user
+    },
+
+    setUserStatus(status: UserStatus) {
+      if (!this.user) return
+      if (status === 'dnd') {
+        this.user.notifications = 'disabled'
+      } else {
+        this.user.notifications = 'enabled'
+      }
+      this.user.status = status
+    },
+  },
+})

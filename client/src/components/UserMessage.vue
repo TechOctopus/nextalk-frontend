@@ -1,10 +1,10 @@
 <template>
-  <q-chat-message :name="fullUserName" :sent="isSent" :stamp="message.stamp">
+  <q-chat-message :name="fullUserName" :sent="isSent" :stamp="stamp">
     <div>
       <q-badge v-if="isMention" rounded color="orange" floating>
         <q-icon name="person" />
       </q-badge>
-      <div v-html="message.text" />
+      <div v-html="message.content" />
     </div>
   </q-chat-message>
 </template>
@@ -13,37 +13,42 @@
 import { defineComponent } from 'vue'
 import type { PropType } from 'vue'
 
-import { useUserStore } from 'src/stores/user'
+import { useAuthStore } from 'src/stores'
 
-import type { Message } from 'src/contracts'
+import type { SerializedMessage } from 'src/contracts'
+import { humanDate } from 'src/utils'
 
 export default defineComponent({
   name: 'UserMessage',
 
   data() {
     return {
-      userStore: useUserStore(),
+      authStore: useAuthStore(),
     }
   },
 
   props: {
     message: {
-      type: Object as PropType<Message>,
+      type: Object as PropType<SerializedMessage>,
       required: true,
     },
   },
 
   computed: {
     isSent(): boolean {
-      return this.message.user.id === this.userStore.user?.id
+      return this.message.author.id === this.authStore.user?.id
     },
 
     isMention(): boolean {
-      return this.message.mentions?.some((mention) => mention.id === this.userStore.user?.id) ?? false
+      return this.message.mentions?.some((mention) => mention.id === this.authStore.user?.id) ?? false
     },
 
     fullUserName(): string {
-      return `${this.message.user.firstName} ${this.message.user.lastName}`
+      return `${this.message.author.firstName} ${this.message.author.lastName}`
+    },
+
+    stamp(): string {
+      return humanDate(this.message.createdAt)
     },
   },
 })

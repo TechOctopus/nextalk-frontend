@@ -24,6 +24,7 @@
               <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" class="cursor-pointer" @click="isPwd = !isPwd" />
             </template>
           </q-input>
+          <q-checkbox v-model="formData.remember" label="Remember me" />
           <q-btn type="submit" label="Sign in" color="primary" class="full-width" size="md" :loading="loading">
             <template v-slot:loading>
               <q-spinner-facebook />
@@ -44,7 +45,9 @@ import { useQuasar } from 'quasar'
 import useVuelidate from '@vuelidate/core'
 import { useRouter } from 'vue-router'
 import { minLength, maxLength, required, email as emailValidator } from '@vuelidate/validators'
-import { authService } from 'src/services/auth'
+import { useAuthStore } from 'src/stores'
+
+const authStore = useAuthStore()
 
 export default defineComponent({
   name: 'LoginPage',
@@ -57,6 +60,7 @@ export default defineComponent({
       formData: {
         email: '',
         password: '',
+        remember: false,
       },
       loading: false,
     }
@@ -66,6 +70,7 @@ export default defineComponent({
       formData: {
         email: { required, email: emailValidator },
         password: { required, minLength: minLength(8), maxLength: maxLength(16) },
+        remember: { required },
       },
     }
   },
@@ -79,16 +84,15 @@ export default defineComponent({
         return
       }
 
-      const response = await authService.login(this.formData)
-
-      if (response.error) {
-        this.q$.notify({ message: response.message, color: 'negative', position: 'top' })
+      try {
+        await authStore.login(this.formData)
         this.loading = false
-        return
+        this.router.push('/channels')
+      } catch (error) {
+        this.q$.notify({ message: 'Invalid email or password', color: 'negative', position: 'top' })
+      } finally {
+        this.loading = false
       }
-
-      this.loading = false
-      this.router.push('/channels')
     },
   },
 })

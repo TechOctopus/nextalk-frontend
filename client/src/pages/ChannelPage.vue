@@ -19,10 +19,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { useMessageStore } from 'src/stores/messages'
 import { useChannelStore } from 'src/stores/channels'
-
-import { messageService } from 'src/services/messages'
+import { useMessageStore } from 'src/stores/messages'
 
 import UserMessage from 'src/components/UserMessage.vue'
 
@@ -35,30 +33,30 @@ export default defineComponent({
 
   data() {
     return {
+      channelStore: useChannelStore(),
       messageStore: useMessageStore(),
-      channel: useChannelStore().currentChannel,
     }
   },
 
   methods: {
     async loadMore(index: number, done: (stop: boolean) => void) {
-      done(await messageService.load(this.channel?.id ?? ''))
+      done(true)
     },
   },
 
   computed: {
     messages() {
-      return this.messageStore.getMessages(this.channel?.id ?? '')
+      return this.messageStore.getMessages(this.channelStore.active ?? '')
     },
   },
 
-  watch: {
-    messages: {
-      async handler() {
-        this.messageStore.messagesRefs = this.$refs.bottomEls as HTMLElement[]
-      },
-      deep: true,
-    },
-  },
+  // watch: {
+  //   messages: {
+  //     async handler() {
+  //       this.messageStore.messagesRefs = this.$refs.bottomEls as HTMLElement[]
+  //     },
+  //     deep: true,
+  //   },
+  // },
 })
 </script>
