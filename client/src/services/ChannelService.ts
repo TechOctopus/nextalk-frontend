@@ -60,10 +60,13 @@ class ChannelService {
       throw new Error('Channel manager is not initialized')
     }
 
-    channls.forEach((channel) => {
-      useMessageStore().leave(channel.name)
-    })
+    await Promise.all(
+      channls.map(async (channel) => {
+        await useMessageStore().leave(channel.name)
+      }),
+    )
 
+    this.channelManager.destroy()
     this.channelManager = null
   }
 

@@ -9,7 +9,7 @@ export type Messages = {
 export const useMessageStore = defineStore('messages', {
   state: () => ({
     messages: {} as Messages,
-    messagesRefs: [] as HTMLElement[],
+    scrollArea: null as HTMLElement | null,
   }),
 
   getters: {

@@ -29,9 +29,6 @@ export const useChannelStore = defineStore('channels', {
 
     async loadChannels() {
       this.channels = await channelService.loadChannels()
-      if (this.channels.length > 0) {
-        this.active = this.channels[0].name
-      }
     },
 
     async quitChannels() {
@@ -50,12 +47,5 @@ export const useChannelStore = defineStore('channels', {
         this.newChannel(newChannel)
       }
     },
-
-    // async leave(channel: string | null) {
-    // const leaving: string[] = channel !== null ? [channel] : this.joinedChannels
-    // leaving.forEach((c) => {
-    //   channelService.leave(c)
-    // })
-    // },
   },
 })
