@@ -29,7 +29,9 @@ export const useChannelStore = defineStore('channels', {
 
     async loadChannels() {
       this.channels = await channelService.loadChannels()
-      this.active = this.channels[0].name
+      if (this.channels.length > 0) {
+        this.active = this.channels[0].name
+      }
     },
 
     async newChannel(channel: Channel) {
