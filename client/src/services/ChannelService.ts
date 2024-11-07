@@ -58,7 +58,9 @@ class ChannelService {
   }
 
   public async addChannel(channelName: string, isPrivate: boolean): Promise<Channel> {
-    return this.channelManager.joinChannel(channelName, isPrivate)
+    const newChannel = this.channelManager.joinChannel(channelName, isPrivate)
+    useMessageStore().join(channelName)
+    return newChannel
   }
 
   public join(name: string): MessageSocketManager {
