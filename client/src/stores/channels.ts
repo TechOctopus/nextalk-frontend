@@ -80,5 +80,9 @@ export const useChannelStore = defineStore('channels', {
     async cancelChannel(channelId: string) {
       await channelService.cancelChannel(channelId)
     },
+
+    async kickUser(userName: string, channelId: string) {
+      await channelService.kickUser(userName, channelId)
+    },
   },
 })

@@ -68,6 +68,26 @@ class ChannelScoketManager extends SocketManager {
         color: 'info',
       })
     })
+
+    this.socket.on('kick', (channel: Channel) => {
+      useChannelStore().removeChannel(channel)
+      useMessageStore().leave(channel.name)
+      Notify.create({
+        message: `You have been kicked from channel ${channel.name}`,
+        position: 'top',
+        color: 'warning',
+      })
+    })
+
+    this.socket.on('ban', (channel: Channel) => {
+      useChannelStore().removeChannel(channel)
+      useMessageStore().leave(channel.name)
+      Notify.create({
+        message: `You have been banned from channel ${channel.name}`,
+        position: 'top',
+        color: 'negative',
+      })
+    })
   }
 
   public joinChannel(channelName: string, isPrivate: boolean): Promise<Channel> {
@@ -92,6 +112,10 @@ class ChannelScoketManager extends SocketManager {
 
   public cancelChannel(channelId: string): Promise<void> {
     return this.emitAsync('cancelChannel', channelId)
+  }
+
+  public kickUser(userName: string, channelId: string): Promise<void> {
+    return this.emitAsync('kickUser', userName, channelId)
   }
 }
 
@@ -159,6 +183,13 @@ class ChannelService {
       throw new Error('Channel manager is not initialized')
     }
     await this.channelManager.cancelChannel(channelId)
+  }
+
+  public async kickUser(userName: string, channelId: string): Promise<void> {
+    if (!this.channelManager) {
+      throw new Error('Channel manager is not initialized')
+    }
+    await this.channelManager.kickUser(userName, channelId)
   }
 
   public join(name: string): MessageSocketManager {
