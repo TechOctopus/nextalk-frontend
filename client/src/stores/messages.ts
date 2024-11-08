@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { SerializedMessage, RawMessage } from 'src/contracts'
 import { channelService } from 'src/services'
+import { useChannelStore } from 'src/stores/channels'
 
 export type Messages = {
   [channel: string]: SerializedMessage[]
@@ -33,9 +34,11 @@ export const useMessageStore = defineStore('messages', {
     },
 
     async addMessage(channel: string, message: RawMessage) {
-      const newMessage = await channelService.in(channel)?.addMessage(message)
-      if (newMessage) {
-        this.newMessage(channel, newMessage)
+      const data = await channelService.in(channel)?.addMessage(message)
+      if (!data) return
+      this.newMessage(channel, data.message)
+      if (data.isChannelJoined) {
+        useChannelStore().changeChannelStatusToJoin(channel)
       }
     },
   },
