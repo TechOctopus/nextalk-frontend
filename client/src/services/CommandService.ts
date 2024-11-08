@@ -92,7 +92,7 @@ class CommandService {
   }
 
   private kickUser(userName: string, channelId: string) {
-    console.log('TODO: kickUser', userName, channelId)
+    useChannelStore().kickUser(userName, channelId)
   }
 
   private cancelChannel(channelId: string) {
