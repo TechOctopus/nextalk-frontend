@@ -14,7 +14,7 @@ class MessageSocketManager extends SocketManager {
     })
   }
 
-  public addMessage(message: RawMessage): Promise<SerializedMessage> {
+  public addMessage(message: RawMessage): Promise<{ message: SerializedMessage; isChannelJoined: boolean }> {
     return this.emitAsync('addMessage', message)
   }
 

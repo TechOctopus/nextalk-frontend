@@ -65,6 +65,14 @@ export const useChannelStore = defineStore('channels', {
       }
     },
 
+    async changeChannelStatusToJoin(channelName: string) {
+      const channel = this.getChannelByName(channelName)
+      if (!channel) {
+        return
+      }
+      channel.status = 'join'
+    },
+
     async inviteUser(userName: string, channelId: string) {
       await channelService.inviteUser(userName, channelId)
     },
