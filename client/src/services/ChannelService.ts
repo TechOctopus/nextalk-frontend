@@ -18,8 +18,8 @@ class MessageSocketManager extends SocketManager {
     return this.emitAsync('addMessage', message)
   }
 
-  public loadMessages(): Promise<SerializedMessage[]> {
-    return this.emitAsync('loadMessages')
+  public loadMessages(offset: number): Promise<SerializedMessage[]> {
+    return this.emitAsync('loadMessages', offset)
   }
 }
 

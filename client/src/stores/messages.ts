@@ -10,6 +10,7 @@ export type Messages = {
 export const useMessageStore = defineStore('messages', {
   state: () => ({
     messages: {} as Messages,
+    offsets: {} as { [channel: string]: number },
     scrollArea: null as HTMLElement | null,
   }),
 
@@ -21,7 +22,17 @@ export const useMessageStore = defineStore('messages', {
 
   actions: {
     async join(channel: string) {
-      this.messages[channel] = await channelService.join(channel).loadMessages()
+      const messages = await channelService.join(channel).loadMessages(0)
+      this.messages[channel] = messages
+      this.offsets[channel] = messages.length
+    },
+
+    async loadMore(channel: string): Promise<boolean> {
+      const messages = await channelService.in(channel)?.loadMessages(this.offsets[channel])
+      if (!messages) return true
+      this.messages[channel].unshift(...messages)
+      this.offsets[channel] += messages.length
+      return messages.length === 0
     },
 
     async leave(channel: string) {
