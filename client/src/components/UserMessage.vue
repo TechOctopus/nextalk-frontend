@@ -1,20 +1,10 @@
 <template>
-  <q-chat-message v-if="message.typing" :name="fullUserName">
-    <q-btn flat dense style="width: 100%; height: 2rem">
-      <q-spinner-dots />
-      <q-menu fit auto-close>
-        <p class="message_typing">
-          {{ messageTyping }}
-        </p>
-      </q-menu>
-    </q-btn>
-  </q-chat-message>
-  <q-chat-message v-else :name="fullUserName" :sent="isSent" :stamp="message.stamp">
+  <q-chat-message :name="fullUserName" :sent="isSent" :stamp="stamp">
     <div>
       <q-badge v-if="isMention" rounded color="orange" floating>
         <q-icon name="person" />
       </q-badge>
-      <div v-html="message.text" />
+      <div v-html="message.content" />
     </div>
   </q-chat-message>
 </template>
@@ -23,63 +13,43 @@
 import { defineComponent } from 'vue'
 import type { PropType } from 'vue'
 
-import { user } from 'src/assets'
-import type { Message } from 'src/types'
+import { useAuthStore } from 'src/stores'
+
+import type { SerializedMessage } from 'src/contracts'
+import { humanDate } from 'src/utils'
 
 export default defineComponent({
   name: 'UserMessage',
 
   data() {
     return {
-      messageTyping: '',
-      messageTypingDestroy: null as (() => void) | null,
+      authStore: useAuthStore(),
     }
   },
 
   props: {
     message: {
-      type: Object as PropType<Message>,
+      type: Object as PropType<SerializedMessage>,
       required: true,
-    },
-  },
-
-  methods: {
-    simulateTyping() {
-      let index = 1
-
-      const intervalId = setInterval(() => {
-        this.messageTyping = this.message.text.slice(0, index++)
-        if (index > this.message.text.length) {
-          index = 1
-        }
-      }, 250)
-
-      return () => clearInterval(intervalId)
     },
   },
 
   computed: {
     isSent(): boolean {
-      return this.message.user.id === user.id
+      return this.message.author.id === this.authStore.user?.id
     },
 
     isMention(): boolean {
-      return this.message.mentions?.some((mention) => mention.id === user.id) ?? false
+      return this.message.mentions?.some((mention) => mention.id === this.authStore.user?.id) ?? false
     },
 
     fullUserName(): string {
-      return `${this.message.user.firstName} ${this.message.user.lastName}`
+      return `${this.message.author.firstName} ${this.message.author.lastName}`
     },
-  },
 
-  mounted() {
-    this.messageTypingDestroy = this.simulateTyping()
-  },
-
-  beforeUnmount() {
-    if (this.messageTypingDestroy) {
-      this.messageTypingDestroy()
-    }
+    stamp(): string {
+      return humanDate(this.message.createdAt)
+    },
   },
 })
 </script>
@@ -87,12 +57,5 @@ export default defineComponent({
 <style lang="scss">
 .mention {
   color: blue;
-}
-
-.message_typing {
-  margin: 0;
-  padding: 0.5rem;
-  font-size: 0.8rem;
-  color: #9e9e9e;
 }
 </style>

@@ -6,9 +6,9 @@
       <q-header elevated>
         <q-toolbar class="WAL__toolbar">
           <q-btn round flat icon="keyboard_arrow_left" class="WAL__drawer-open q-mr-sm" @click="toggleLeftDrawer" />
-          <span class="q-subtitle-1 q-pl-md ellipsis">{{ channelsStore.currentChannel?.name }}</span>
+          <span class="q-subtitle-1 q-pl-md ellipsis">{{ channelsStore.active?.name }}</span>
           <q-space />
-          <template v-if="channelsStore.currentChannel">
+          <template v-if="channelsStore.active">
             <q-btn round flat icon="info" @click="membersStore.membersDialog = true" />
             <dialog-wrapper v-model="membersStore.membersDialog" title="Channel info" maxWidth="400px">
               <channel-info @close="membersStore.membersDialog = false" />
@@ -34,7 +34,7 @@
                 <q-item clickable @click="showNewChannelDialog = true">
                   <q-item-section>New channel</q-item-section>
                 </q-item>
-                <q-item clickable to="/login">
+                <q-item clickable @click="logout">
                   <q-item-section>Logout</q-item-section>
                 </q-item>
                 <q-item clickable to="/channels/settings">
@@ -51,7 +51,7 @@
       </q-drawer>
 
       <q-page-container class="bg-grey-1">
-        <router-view :key="channelsStore.currentChannel?.id" />
+        <router-view :key="channelsStore.active?.name ?? ''" />
       </q-page-container>
 
       <q-footer>
@@ -62,9 +62,12 @@
 </template>
 
 <script lang="ts">
+import { useRouter } from 'vue-router'
+
 import { defineComponent } from 'vue'
 import { useChannelStore } from 'src/stores/channels'
 import { useMembersStore } from 'src/stores/members'
+import { useAuthStore } from 'src/stores/auth'
 
 import ChannelInfo from 'src/components/ChannelInfo.vue'
 import DialogWrapper from 'src/components/DialogWrapper.vue'
@@ -87,10 +90,12 @@ export default defineComponent({
 
   data() {
     return {
-      channelsStore: useChannelStore(),
       leftDrawerOpen: false,
-      membersStore: useMembersStore(),
       showNewChannelDialog: false,
+      router: useRouter(),
+      membersStore: useMembersStore(),
+      channelsStore: useChannelStore(),
+      authStore: useAuthStore(),
     }
   },
 
@@ -98,6 +103,15 @@ export default defineComponent({
     toggleLeftDrawer() {
       this.leftDrawerOpen = !this.leftDrawerOpen
     },
+
+    async logout() {
+      await this.authStore.logout()
+      this.router.push('/login')
+    },
+  },
+
+  mounted() {
+    this.channelsStore.loadChannels()
   },
 })
 </script>

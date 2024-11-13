@@ -1,22 +1,22 @@
 <template>
   <q-btn flat no-cap>
     <q-icon :name="userStatusIcon" :color="userStatusIconColor" size="0.8rem" class="q-mr-xs" />
-    <span class="user-name">{{ userStore.getFullName }}</span>
+    <span class="user-name">{{ authStore.getFullName }}</span>
     <q-menu fit>
       <q-list>
-        <q-item clickable v-close-popup @click="userStore.setUserStatus('online')">
+        <q-item clickable v-close-popup @click="authStore.setUserStatus('online')">
           <q-item-section avatar>
             <q-icon name="circle" color="green" />
           </q-item-section>
           <q-item-section> Online </q-item-section>
         </q-item>
-        <q-item clickable v-close-popup @click="userStore.setUserStatus('offline')">
+        <q-item clickable v-close-popup @click="authStore.setUserStatus('offline')">
           <q-item-section avatar>
             <q-icon name="do_not_disturb_off" color="grey-8" />
           </q-item-section>
           <q-item-section> Offline </q-item-section>
         </q-item>
-        <q-item clickable v-close-popup @click="userStore.setUserStatus('dnd')">
+        <q-item clickable v-close-popup @click="authStore.setUserStatus('dnd')">
           <q-item-section avatar>
             <q-icon name="do_not_disturb_on" color="orange" />
           </q-item-section>
@@ -30,14 +30,14 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 
-import { useUserStore } from 'src/stores/user'
+import { useAuthStore } from 'src/stores'
 
 export default defineComponent({
   name: 'UserStatus',
 
   data() {
     return {
-      userStore: useUserStore(),
+      authStore: useAuthStore(),
     }
   },
 
@@ -45,7 +45,7 @@ export default defineComponent({
 
   computed: {
     userStatusIcon(): string {
-      switch (this.userStore.user.status) {
+      switch (this.authStore.user?.status) {
         case 'online':
           return 'circle'
         case 'offline':
@@ -58,7 +58,7 @@ export default defineComponent({
     },
 
     userStatusIconColor(): string {
-      switch (this.userStore.user.status) {
+      switch (this.authStore.user?.status) {
         case 'online':
           return 'green'
         case 'offline':

@@ -51,11 +51,11 @@
           </q-input>
           <q-input
             outlined
-            v-model="formData.confirmPassword"
+            v-model="formData.passwordConfirmation"
             :type="isPwd ? 'password' : 'text'"
             label="Confirm Password *"
-            :error="v$.formData.confirmPassword.$error"
-            :error-message="v$.formData.confirmPassword.$errors[0]?.$message"
+            :error="v$.formData.passwordConfirmation.$error"
+            :error-message="v$.formData.passwordConfirmation.$errors[0]?.$message"
           >
             <template v-slot:append>
               <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" class="cursor-pointer" @click="isPwd = !isPwd" />
@@ -81,6 +81,9 @@ import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
 import useVuelidate from '@vuelidate/core'
 import { minLength, maxLength, required, email as emailValidator, sameAs } from '@vuelidate/validators'
+import { useAuthStore } from 'src/stores'
+
+const authStore = useAuthStore()
 
 export default defineComponent({
   name: 'RegisterPage',
@@ -90,7 +93,7 @@ export default defineComponent({
       formData: {
         email: '',
         password: '',
-        confirmPassword: '',
+        passwordConfirmation: '',
         username: '',
         firstName: '',
         lastName: '',
@@ -111,7 +114,7 @@ export default defineComponent({
         email: { required, emailValidator },
         username: { required, minLength: minLength(3), maxLength: maxLength(20) },
         password: { required, minLength: minLength(8), maxLength: maxLength(16) },
-        confirmPassword: { required, sameAsPassword: sameAs(this.formData.password) },
+        passwordConfirmation: { required, sameAsPassword: sameAs(this.formData.password) },
       },
     }
   },
@@ -124,9 +127,17 @@ export default defineComponent({
         this.loading = false
         return
       }
-      this.q$.notify({ message: 'Account created successfully', color: 'positive', position: 'top' })
-      this.router.push('/login')
-      this.loading = false
+
+      try {
+        await authStore.register(this.formData)
+        this.q$.notify({ message: 'Account created successfully', color: 'positive', position: 'top' })
+        this.router.push('/login')
+        this.loading = false
+      } catch (error) {
+        this.q$.notify({ message: "Couldn't create account", color: 'negative', position: 'top' })
+      } finally {
+        this.loading = false
+      }
     },
   },
 })

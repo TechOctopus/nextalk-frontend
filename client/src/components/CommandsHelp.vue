@@ -13,14 +13,14 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { allCommands } from 'src/services/commands'
+import { commandService } from 'src/services'
 
 export default defineComponent({
   name: 'CommandHelp',
 
   data() {
     return {
-      allCommands,
+      allCommands: commandService.allCommands,
     }
   },
 

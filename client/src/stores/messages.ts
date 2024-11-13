@@ -1,71 +1,45 @@
 import { defineStore } from 'pinia'
-import { Message } from 'src/types'
-import { messagesFor1, messagesFor2, messagesFor3, user } from 'src/assets'
+import { SerializedMessage, RawMessage } from 'src/contracts'
+import { channelService } from 'src/services'
+import { useChannelStore } from 'src/stores/channels'
 
 export type Messages = {
-  [channelId: string]: {
-    messages: Message[]
-    offset: number
-  }
+  [channel: string]: SerializedMessage[]
 }
 
 export const useMessageStore = defineStore('messages', {
   state: () => ({
-    messages: {
-      '1': {
-        messages: messagesFor1.slice(messagesFor1.length - 10),
-        offset: 10,
-      },
-      '2': {
-        messages: messagesFor2,
-        offset: 0,
-      },
-      '3': {
-        messages: messagesFor3,
-        offset: 0,
-      },
-    } as Messages,
-    messagesRefs: [] as HTMLElement[],
+    messages: {} as Messages,
+    scrollArea: null as HTMLElement | null,
   }),
 
   getters: {
-    getMessages: (state) => (channelId: string) => {
-      return state.messages[channelId]?.messages || []
+    getMessages: (state) => (channel: string) => {
+      return state.messages[channel] || []
     },
   },
 
   actions: {
-    // only for demonstration purposes of infinite scroll working
-    loadMore(channelId: string): boolean {
-      const messages = this.messages[channelId].messages
-      const offset = this.messages[channelId].offset
-
-      if (messagesFor1.length - offset - 10 <= 0) return true
-
-      const newMessages = messagesFor1.slice(messagesFor1.length - 10 - offset, messagesFor1.length - offset)
-      this.messages[channelId].messages = [...newMessages, ...messages]
-      this.messages[channelId].offset += newMessages.length
-
-      return false
+    async join(channel: string) {
+      this.messages[channel] = await channelService.join(channel).loadMessages()
     },
 
-    sendMessage(channelId: string, message: string) {
-      if (this.messages[channelId] === undefined) {
-        this.messages[channelId] = {
-          messages: [],
-          offset: 0,
-        }
+    async leave(channel: string) {
+      delete this.messages[channel]
+      channelService.leave(channel)
+    },
+
+    async newMessage(channel: string, message: SerializedMessage) {
+      this.messages[channel].push(message)
+    },
+
+    async addMessage(channel: string, message: RawMessage) {
+      const data = await channelService.in(channel)?.addMessage(message)
+      if (!data) return
+      this.newMessage(channel, data.message)
+      if (data.isChannelJoined) {
+        useChannelStore().changeChannelStatusToJoin(channel)
       }
-
-      this.messages[channelId].messages.push({
-        user,
-        text: message,
-        stamp: new Date().toLocaleTimeString(),
-        mentions: [],
-        createdAt: new Date().toISOString(),
-      })
-
-      this.messages[channelId].messages.sort((a, b) => (a.typing === true ? 1 : b.typing === true ? -1 : 0))
     },
   },
 })

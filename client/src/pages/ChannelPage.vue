@@ -8,9 +8,10 @@
               <q-spinner color="primary" name="dots" size="40px" />
             </div>
           </template>
-          <div v-for="(message, index) in messages" :key="index" ref="bottomEls">
+          <div v-for="(message, index) in messages" :key="index">
             <user-message :message="message" />
           </div>
+          <div ref="bottom"></div>
         </q-infinite-scroll>
       </div>
     </div>
@@ -19,8 +20,9 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { useMessageStore } from 'src/stores/messages'
 import { useChannelStore } from 'src/stores/channels'
+import { useMessageStore } from 'src/stores/messages'
+
 import UserMessage from 'src/components/UserMessage.vue'
 
 export default defineComponent({
@@ -32,37 +34,25 @@ export default defineComponent({
 
   data() {
     return {
+      channelStore: useChannelStore(),
       messageStore: useMessageStore(),
-      channel: useChannelStore().currentChannel,
     }
   },
 
   methods: {
-    loadMore(index: number, done: (stop: boolean) => void) {
-      if (this.channel?.id !== '1') {
-        done(true)
-        return
-      }
-
-      setTimeout(() => {
-        done(this.messageStore.loadMore(this.channel?.id ?? ''))
-      }, 1000)
+    async loadMore(index: number, done: (stop: boolean) => void) {
+      done(true)
     },
   },
 
   computed: {
     messages() {
-      return this.messageStore.getMessages(this.channel?.id ?? '')
+      return this.messageStore.getMessages(this.channelStore.active?.name ?? '')
     },
   },
 
-  watch: {
-    messages: {
-      async handler() {
-        this.messageStore.messagesRefs = this.$refs.bottomEls as HTMLElement[]
-      },
-      deep: true,
-    },
+  mounted() {
+    this.messageStore.scrollArea = this.$refs.bottom as HTMLElement
   },
 })
 </script>

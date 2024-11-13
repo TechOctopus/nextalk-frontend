@@ -1,38 +1,96 @@
 import { defineStore } from 'pinia'
-import type { Channel } from 'src/types'
-
-import { channels } from 'src/assets'
+import type { Channel } from 'src/contracts'
+import { channelService } from 'src/services'
+import { router } from 'src/router'
 
 export const useChannelStore = defineStore('channels', {
   state: () => ({
-    channels,
-    currentChannel: undefined as Channel | undefined,
+    channels: [] as Channel[],
+    active: null as Channel | null,
   }),
 
   getters: {
+    joinedChannels: (state) => {
+      return state.channels
+    },
+
     getChannelByName: (state) => (name: string) => {
-      return state.channels.find((channel) => channel.name === name)
+      return state.channels.find((c) => c.name === name)
     },
   },
 
   actions: {
     setCurrentChannel(channelName: string) {
-      this.currentChannel = this.getChannelByName(channelName)
+      const channel = this.getChannelByName(channelName)
+      if (!channel) {
+        return
+      }
+      this.active = channel
     },
 
     resetCurrentChannel() {
-      this.currentChannel = undefined
+      this.active = null
     },
 
-    addChannel(channel: Channel) {
+    async loadChannels() {
+      this.channels = await channelService.loadChannels()
+    },
+
+    async quitChannels() {
+      await channelService.quitChannels(this.channels)
+      this.channels = []
+      this.active = null
+    },
+
+    newChannel(channel: Channel) {
       this.channels.push(channel)
     },
 
-    removeChannel(channelId: string) {
-      const index = this.channels.findIndex((channel) => channel.id === channelId)
+    removeChannel(channel: Channel) {
+      const index = this.channels.findIndex((c) => c.id === channel.id)
       if (index !== -1) {
         this.channels.splice(index, 1)
       }
+
+      if (this.active?.id === channel.id) {
+        this.active = null
+        router.push('/channels')
+      }
+    },
+
+    async addChannel(channelName: string, isPrivate: boolean) {
+      const newChannel = await channelService.addChannel(channelName, isPrivate)
+      if (newChannel) {
+        this.newChannel(newChannel)
+      }
+    },
+
+    async changeChannelStatusToJoin(channelName: string) {
+      const channel = this.getChannelByName(channelName)
+      if (!channel) {
+        return
+      }
+      channel.status = 'join'
+    },
+
+    async inviteUser(userName: string, channelId: string) {
+      await channelService.inviteUser(userName, channelId)
+    },
+
+    async revokeUser(userName: string, channelId: string) {
+      await channelService.revokeUser(userName, channelId)
+    },
+
+    async quitChannel(channelId: string) {
+      await channelService.quitChannel(channelId)
+    },
+
+    async cancelChannel(channelId: string) {
+      await channelService.cancelChannel(channelId)
+    },
+
+    async kickUser(userName: string, channelId: string) {
+      await channelService.kickUser(userName, channelId)
     },
   },
 })

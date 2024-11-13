@@ -32,14 +32,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick } from 'vue'
+import { defineComponent } from 'vue'
 import { useQuasar } from 'quasar'
 
 import DialogWrapper from 'src/components/DialogWrapper.vue'
 import CommandsHelp from 'src/components/CommandsHelp.vue'
 
+import { useChannelStore } from 'src/stores/channels'
 import { useMessageStore } from 'src/stores/messages'
-import { isCommand, send } from 'src/services/commands'
+
+import { commandService } from 'src/services'
 
 export default defineComponent({
   name: 'CommandLine',
@@ -53,7 +55,8 @@ export default defineComponent({
     return {
       message: '',
       showCommandsHelpDialog: false,
-      messagesStore: useMessageStore(),
+      channelStore: useChannelStore(),
+      messageStore: useMessageStore(),
       q$: useQuasar(),
     }
   },
@@ -61,15 +64,14 @@ export default defineComponent({
   methods: {
     async sendMessage() {
       try {
-        send(this.message)
+        await commandService.send(this.message)
         this.message = ''
-        await nextTick().then(() => {
-          const lastMessage = (this.messagesStore.messagesRefs || []).slice(-1)[0]
-          if (lastMessage) {
-            lastMessage.scrollIntoView({ behavior: 'smooth' })
-          }
-          ;(this.$refs.commandLineInput as HTMLInputElement).focus()
-        })
+        setTimeout(() => {
+          this.messageStore.scrollArea?.scrollIntoView({
+            behavior: 'smooth',
+          })
+        }, 100)
+        ;(this.$refs.commandLineInput as HTMLInputElement).focus()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         this.q$.notify({
@@ -83,7 +85,7 @@ export default defineComponent({
 
   computed: {
     isCommand() {
-      return isCommand(this.message)
+      return commandService.isCommand(this.message)
     },
   },
 })

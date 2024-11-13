@@ -1,5 +1,5 @@
 <template>
-  <q-form class="column" style="width: 100%">
+  <q-form class="column" style="width: 100%" @submit.prevent="handleCreateChannel">
     <div class="col">
       <q-input
         outlined
@@ -21,14 +21,7 @@
         :error-message="v$.formData.isPrivate.$errors[0]?.$message"
       />
     </div>
-    <q-btn
-      type="submit"
-      label="Create channel"
-      color="primary"
-      class="col q-mt-md"
-      size="md"
-      @click="handleCreateChannel"
-    />
+    <q-btn type="submit" label="Create channel" color="primary" class="col q-mt-md" size="md" />
   </q-form>
 </template>
 
@@ -38,7 +31,7 @@ import { defineComponent } from 'vue'
 import useVuelidate from '@vuelidate/core'
 import { minLength, maxLength, required } from '@vuelidate/validators'
 
-import { joinChannel } from 'src/services/commands'
+import { useChannelStore } from 'src/stores'
 
 export default defineComponent({
   name: 'NewChannel',
@@ -50,6 +43,7 @@ export default defineComponent({
         name: '',
         isPrivate: false,
       },
+      useChannelStore: useChannelStore(),
     }
   },
 
@@ -69,8 +63,12 @@ export default defineComponent({
   },
 
   methods: {
-    handleCreateChannel() {
-      joinChannel(this.formData.name, this.formData.isPrivate)
+    async handleCreateChannel() {
+      const isValid = await this.v$.$validate()
+      if (!isValid) return
+
+      this.useChannelStore.addChannel(this.formData.name, this.formData.isPrivate)
+
       this.$emit('close')
     },
   },
