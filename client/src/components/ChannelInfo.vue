@@ -81,7 +81,6 @@ export default defineComponent({
 
   computed: {
     isAdmin() {
-      console.log(this.authStore.user?.id, this.channelStore.active?.adminId)
       return this.authStore.user?.id === this.channelStore.active?.adminId
     },
   },

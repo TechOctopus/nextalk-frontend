@@ -41,7 +41,7 @@ export default defineComponent({
 
   methods: {
     async loadMore(index: number, done: (stop: boolean) => void) {
-      done(true)
+      done(await this.messageStore.loadMore(this.channelStore.active?.name ?? ''))
     },
   },
 
