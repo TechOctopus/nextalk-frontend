@@ -24,7 +24,7 @@ export const useMessageStore = defineStore('messages', {
     async join(channel: string) {
       const messages = await channelService.join(channel).loadMessages(0)
       this.messages[channel] = messages
-      this.offsets[channel] = messages.length
+      this.offsets[channel] = messages.length || 0
     },
 
     async loadMore(channel: string): Promise<boolean> {

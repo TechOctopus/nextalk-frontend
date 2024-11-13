@@ -1,5 +1,5 @@
 import { SerializedMessage, RawMessage } from './Message'
-import { User, UserStatus, Member } from './User'
+import { User, UserStatus, Member, UserNotification } from './User'
 import { Channel } from './Channel'
 import { ApiToken, RegisterData, LoginCredentials } from './Auth'
 
@@ -13,4 +13,5 @@ export type {
   RegisterData,
   LoginCredentials,
   Member,
+  UserNotification,
 }
