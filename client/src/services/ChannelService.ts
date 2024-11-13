@@ -1,4 +1,4 @@
-import { Channel, RawMessage, SerializedMessage } from 'src/contracts'
+import { Channel, RawMessage, SerializedMessage, Member } from 'src/contracts'
 import { SocketManager } from './SocketManager'
 import { useMessageStore } from 'src/stores/messages'
 import { useChannelStore } from 'src/stores/channels'
@@ -117,6 +117,10 @@ class ChannelScoketManager extends SocketManager {
   public kickUser(userName: string, channelId: string): Promise<void> {
     return this.emitAsync('kickUser', userName, channelId)
   }
+
+  public listUsers(channelId: string): Promise<Member[]> {
+    return this.emitAsync('listUsers', channelId)
+  }
 }
 
 class ChannelService {
@@ -190,6 +194,13 @@ class ChannelService {
       throw new Error('Channel manager is not initialized')
     }
     await this.channelManager.kickUser(userName, channelId)
+  }
+
+  public async listUsers(channelId: string): Promise<Member[]> {
+    if (!this.channelManager) {
+      throw new Error('Channel manager is not initialized')
+    }
+    return this.channelManager.listUsers(channelId)
   }
 
   public join(name: string): MessageSocketManager {
