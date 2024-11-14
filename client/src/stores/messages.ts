@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { SerializedMessage, RawMessage } from 'src/contracts'
+import { SerializedMessage, RawMessage, User } from 'src/contracts'
 import { channelService } from 'src/services'
 import { useChannelStore } from 'src/stores/channels'
 
@@ -41,7 +41,11 @@ export const useMessageStore = defineStore('messages', {
     },
 
     async newMessage(channel: string, message: SerializedMessage) {
+      const typingMessages = this.messages[channel].filter((msg) => msg.typing)
+      this.messages[channel] = this.messages[channel].filter((msg) => !msg.typing)
+
       this.messages[channel].push(message)
+      this.messages[channel].push(...typingMessages)
     },
 
     async addMessage(channel: string, message: RawMessage) {
@@ -51,6 +55,28 @@ export const useMessageStore = defineStore('messages', {
       if (data.isChannelJoined) {
         useChannelStore().changeChannelStatusToJoin(channel)
       }
+    },
+
+    addTyping(channelName: string, user: User, text: string) {
+      const typeMessageId = parseInt(user.id) * -1
+      const typingMessage: SerializedMessage = {
+        id: typeMessageId,
+        author: user,
+        content: text,
+        mentions: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        typing: true,
+      }
+
+      // update if already exists
+      this.messages[channelName] = this.messages[channelName].filter((msg) => msg.id !== typeMessageId)
+      this.messages[channelName].push(typingMessage)
+    },
+
+    removeTyping(channelName: string, user: User) {
+      const typeMessageId = parseInt(user.id) * -1
+      this.messages[channelName] = this.messages[channelName].filter((msg) => msg.id !== typeMessageId)
     },
   },
 })
