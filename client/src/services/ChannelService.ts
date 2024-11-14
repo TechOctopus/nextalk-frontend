@@ -2,6 +2,7 @@ import { Channel, RawMessage, SerializedMessage, Member } from 'src/contracts'
 import { SocketManager } from './SocketManager'
 import { useMessageStore } from 'src/stores/messages'
 import { useChannelStore } from 'src/stores/channels'
+import { notificationService } from '.'
 
 import { Notify } from 'quasar'
 
@@ -11,6 +12,7 @@ class MessageSocketManager extends SocketManager {
 
     this.socket.on('message', (message: SerializedMessage) => {
       useMessageStore().newMessage(channel, message)
+      notificationService.notifyMessage(channel, message)
     })
   }
 

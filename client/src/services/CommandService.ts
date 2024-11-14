@@ -72,6 +72,7 @@ class CommandService {
     try {
       await useChannelStore().addChannel(name, isPrivate)
       router.push(`/channels/${name}`)
+      // Notify.create({
     } catch (error) {
       Notify.create({
         message: 'Could not join channel',
