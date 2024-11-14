@@ -41,7 +41,7 @@ import CommandsHelp from 'src/components/CommandsHelp.vue'
 import { useChannelStore } from 'src/stores/channels'
 import { useMessageStore } from 'src/stores/messages'
 
-import { commandService } from 'src/services'
+import { commandService, typingService } from 'src/services'
 
 export default defineComponent({
   name: 'CommandLine',
@@ -86,6 +86,19 @@ export default defineComponent({
   computed: {
     isCommand() {
       return commandService.isCommand(this.message)
+    },
+  },
+
+  watch: {
+    message: {
+      handler() {
+        if (this.message.length > 0) {
+          typingService.typing(this.message)
+        } else {
+          typingService.stopTyping()
+        }
+      },
+      immediate: true,
     },
   },
 })

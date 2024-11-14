@@ -25,6 +25,8 @@ import { useMessageStore } from 'src/stores/messages'
 
 import UserMessage from 'src/components/UserMessage.vue'
 
+import { typingService } from 'src/services'
+
 export default defineComponent({
   name: 'ChannelPage',
 
@@ -53,6 +55,15 @@ export default defineComponent({
 
   mounted() {
     this.messageStore.scrollArea = this.$refs.bottom as HTMLElement
+    if (this.channelStore.active) {
+      typingService.subscribe(this.channelStore.active?.name || '')
+    }
+  },
+
+  beforeUnmount() {
+    if (this.channelStore.active) {
+      typingService.unsubscribe()
+    }
   },
 })
 </script>
