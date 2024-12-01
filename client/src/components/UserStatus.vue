@@ -4,19 +4,19 @@
     <span class="user-name">{{ authStore.getFullName }}</span>
     <q-menu fit>
       <q-list>
-        <q-item clickable v-close-popup @click="authStore.setUserStatus('online')">
+        <q-item clickable v-close-popup @click="setUserStatus('online')">
           <q-item-section avatar>
             <q-icon name="circle" color="green" />
           </q-item-section>
           <q-item-section> Online </q-item-section>
         </q-item>
-        <q-item clickable v-close-popup @click="authStore.setUserStatus('offline')">
+        <q-item clickable v-close-popup @click="setUserStatus('offline')">
           <q-item-section avatar>
             <q-icon name="do_not_disturb_off" color="grey-8" />
           </q-item-section>
           <q-item-section> Offline </q-item-section>
         </q-item>
-        <q-item clickable v-close-popup @click="authStore.setUserStatus('dnd')">
+        <q-item clickable v-close-popup @click="setUserStatus('dnd')">
           <q-item-section avatar>
             <q-icon name="do_not_disturb_on" color="orange" />
           </q-item-section>
@@ -31,6 +31,9 @@
 import { defineComponent } from 'vue'
 
 import { useAuthStore } from 'src/stores'
+import { activityService } from 'src/services'
+
+import type { UserStatus } from 'src/contracts'
 
 export default defineComponent({
   name: 'UserStatus',
@@ -41,7 +44,12 @@ export default defineComponent({
     }
   },
 
-  methods: {},
+  methods: {
+    setUserStatus(status: UserStatus) {
+      activityService.updateStatus(status)
+      this.authStore.setUserStatus(status)
+    },
+  },
 
   computed: {
     userStatusIcon(): string {
