@@ -1,6 +1,7 @@
-import { User, UserNotification } from 'src/contracts'
+import { User, UserNotification, UserStatus } from 'src/contracts'
 import { authManager } from '.'
 import { SocketManager } from './SocketManager'
+import { useAuthStore } from 'src/stores'
 
 class ActivitySocketManager extends SocketManager {
   public subscribe(): void {
@@ -16,6 +17,10 @@ class ActivitySocketManager extends SocketManager {
       console.info('User is offline', user)
     })
 
+    this.socket.on('user:connected', () => {
+      useAuthStore().setUserStatus('online')
+    })
+
     authManager.onChange((token) => {
       if (token) {
         this.socket.connect()
@@ -27,6 +32,10 @@ class ActivitySocketManager extends SocketManager {
 
   public updateNotificationSettings(notifications: UserNotification): Promise<void> {
     return this.emitAsync('userNotifications', notifications)
+  }
+
+  public updateStatus(status: UserStatus): Promise<void> {
+    return this.emitAsync('userStatus', status)
   }
 }
 

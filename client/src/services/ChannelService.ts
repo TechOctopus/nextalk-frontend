@@ -5,14 +5,17 @@ import { useChannelStore } from 'src/stores/channels'
 import { notificationService } from '.'
 
 import { Notify } from 'quasar'
+import { useAuthStore } from 'src/stores'
 
 class MessageSocketManager extends SocketManager {
   public subscribe(): void {
     const channel = this.namespace.split('/').pop() as string
 
     this.socket.on('message', (message: SerializedMessage) => {
-      useMessageStore().newMessage(channel, message)
-      notificationService.notifyMessage(channel, message)
+      if (useAuthStore().user?.status !== 'offline') {
+        useMessageStore().newMessage(channel, message)
+        notificationService.notifyMessage(channel, message)
+      }
     })
   }
 

@@ -61,9 +61,7 @@ export default defineComponent({
   },
 
   beforeUnmount() {
-    if (this.channelStore.active) {
-      typingService.unsubscribe()
-    }
+    typingService.unsubscribe()
   },
 })
 </script>
