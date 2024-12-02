@@ -62,16 +62,3 @@ export default defineComponent({
   },
 })
 </script>
-
-<style lang="scss">
-.mention {
-  color: blue;
-}
-
-.message_typing {
-  margin: 0;
-  padding: 0.5rem;
-  font-size: 0.8rem;
-  color: #9e9e9e;
-}
-</style>
