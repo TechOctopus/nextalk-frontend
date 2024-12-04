@@ -7,12 +7,10 @@ class TypingSocketManager extends SocketManager {
     const channelName = this.namespace.split('/').pop() as string
 
     this.socket.on('typing', (user: User, text: string) => {
-      console.log(`${user.username} is typing: ${text} in ${channelName}`)
       useMessageStore().addTyping(channelName, user, text)
     })
 
     this.socket.on('stopTyping', (user: User) => {
-      console.log(`${user.username} stopped typing in ${channelName}`)
       useMessageStore().removeTyping(channelName, user)
     })
   }
