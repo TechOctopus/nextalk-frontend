@@ -3,6 +3,7 @@ import { useMessageStore } from 'src/stores/messages'
 
 import { router } from 'src/router'
 import { Notify } from 'quasar'
+import { useMembersStore } from 'src/stores/members'
 
 type CommandArgument = {
   name: string
@@ -67,9 +68,11 @@ class CommandService {
   }
 
   private async joinChannel(name: string, isPrivate: boolean) {
+    console.info('Joining channel', name, isPrivate)
     try {
       await useChannelStore().addChannel(name, isPrivate)
       router.push(`/channels/${name}`)
+      // Notify.create({
     } catch (error) {
       Notify.create({
         message: 'Could not join channel',
@@ -80,27 +83,33 @@ class CommandService {
   }
 
   public inviteUser(userName: string, channelId: string) {
+    console.info('Inviting user', userName, channelId)
     useChannelStore().inviteUser(userName, channelId)
   }
 
   private revokeUser(userName: string, channelId: string) {
+    console.info('Revoking user', userName, channelId)
     useChannelStore().revokeUser(userName, channelId)
   }
 
   private quitChannel(channelId: string) {
+    console.info('Quitting channel', channelId)
     useChannelStore().quitChannel(channelId)
   }
 
   private kickUser(userName: string, channelId: string) {
+    console.info('Kicking user', userName, channelId)
     useChannelStore().kickUser(userName, channelId)
   }
 
   private cancelChannel(channelId: string) {
+    console.info('Cancelling operation', channelId)
     useChannelStore().cancelChannel(channelId)
   }
 
   private listMembers(channelId: string) {
-    console.info('TODO: listMembers', channelId)
+    console.info('Listing members', channelId)
+    useMembersStore().membersDialog = true
   }
 
   private createCommand(

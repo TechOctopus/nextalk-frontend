@@ -51,7 +51,8 @@
       </q-drawer>
 
       <q-page-container class="bg-grey-1">
-        <router-view :key="channelsStore.active?.name ?? ''" />
+        <div v-if="isOffline"><offline-mode /></div>
+        <router-view v-else :key="channelsStore.active?.name ?? ''" />
       </q-page-container>
 
       <q-footer>
@@ -75,6 +76,7 @@ import NewChannel from 'src/components/NewChannel.vue'
 import ChannelsList from 'src/components/ChannelsList.vue'
 import CommandLine from 'src/components/CommandLine.vue'
 import UserStatus from 'src/components/UserStatus.vue'
+import OfflineMode from 'src/components/OfflineMode.vue'
 
 export default defineComponent({
   name: 'ChannelLayout',
@@ -86,6 +88,7 @@ export default defineComponent({
     NewChannel,
     ChannelsList,
     UserStatus,
+    OfflineMode,
   },
 
   data() {
@@ -96,6 +99,7 @@ export default defineComponent({
       membersStore: useMembersStore(),
       channelsStore: useChannelStore(),
       authStore: useAuthStore(),
+      isOffline: false,
     }
   },
 
@@ -108,10 +112,23 @@ export default defineComponent({
       await this.authStore.logout()
       this.router.push('/login')
     },
+
+    handleNetworkChange() {
+      this.isOffline = !navigator.onLine
+      this.authStore.setUserStatus(this.isOffline ? 'offline' : 'online')
+    },
   },
 
   mounted() {
     this.channelsStore.loadChannels()
+
+    window.addEventListener('offline', this.handleNetworkChange)
+    window.addEventListener('online', this.handleNetworkChange)
+  },
+
+  beforeUnmount() {
+    window.removeEventListener('offline', this.handleNetworkChange)
+    window.removeEventListener('online', this.handleNetworkChange)
   },
 })
 </script>

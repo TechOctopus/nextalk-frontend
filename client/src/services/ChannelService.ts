@@ -1,16 +1,21 @@
-import { Channel, RawMessage, SerializedMessage } from 'src/contracts'
+import { Channel, RawMessage, SerializedMessage, Member } from 'src/contracts'
 import { SocketManager } from './SocketManager'
 import { useMessageStore } from 'src/stores/messages'
 import { useChannelStore } from 'src/stores/channels'
+import { notificationService } from '.'
 
 import { Notify } from 'quasar'
+import { useAuthStore } from 'src/stores'
 
 class MessageSocketManager extends SocketManager {
   public subscribe(): void {
     const channel = this.namespace.split('/').pop() as string
 
     this.socket.on('message', (message: SerializedMessage) => {
-      useMessageStore().newMessage(channel, message)
+      if (useAuthStore().user?.status !== 'offline') {
+        useMessageStore().newMessage(channel, message)
+        notificationService.notifyMessage(channel, message)
+      }
     })
   }
 
@@ -18,8 +23,8 @@ class MessageSocketManager extends SocketManager {
     return this.emitAsync('addMessage', message)
   }
 
-  public loadMessages(): Promise<SerializedMessage[]> {
-    return this.emitAsync('loadMessages')
+  public loadMessages(offset: number): Promise<SerializedMessage[]> {
+    return this.emitAsync('loadMessages', offset)
   }
 }
 
@@ -117,6 +122,10 @@ class ChannelScoketManager extends SocketManager {
   public kickUser(userName: string, channelId: string): Promise<void> {
     return this.emitAsync('kickUser', userName, channelId)
   }
+
+  public listUsers(channelId: string): Promise<Member[]> {
+    return this.emitAsync('listUsers', channelId)
+  }
 }
 
 class ChannelService {
@@ -190,6 +199,13 @@ class ChannelService {
       throw new Error('Channel manager is not initialized')
     }
     await this.channelManager.kickUser(userName, channelId)
+  }
+
+  public async listUsers(channelId: string): Promise<Member[]> {
+    if (!this.channelManager) {
+      throw new Error('Channel manager is not initialized')
+    }
+    return this.channelManager.listUsers(channelId)
   }
 
   public join(name: string): MessageSocketManager {

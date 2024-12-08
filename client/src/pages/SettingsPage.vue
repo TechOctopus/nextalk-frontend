@@ -10,7 +10,7 @@
             <q-item-label caption> If you disable this, you will not receive any notifications </q-item-label>
           </q-item-section>
           <q-item-section side top>
-            <q-toggle v-model="notification" :disable="isNotificationDisabled" />
+            <q-toggle v-model="notifications" :disable="isNotificationDisabled" />
           </q-item-section>
         </q-item>
 
@@ -28,7 +28,7 @@
         <q-separator spaced />
         <q-item-label header>Online status</q-item-label>
 
-        <q-item clickable @click="authStore.setUserStatus('online')">
+        <q-item clickable @click="setUserStatus('online')">
           <q-item-section avatar>
             <q-icon name="circle" color="green" />
           </q-item-section>
@@ -40,7 +40,7 @@
             <q-icon v-if="authStore.user?.status === 'online'" name="check" />
           </q-item-section>
         </q-item>
-        <q-item clickable @click="authStore.setUserStatus('offline')">
+        <q-item clickable @click="setUserStatus('offline')">
           <q-item-section avatar>
             <q-icon name="do_not_disturb_off" color="grey-8" />
           </q-item-section>
@@ -52,7 +52,7 @@
             <q-icon v-if="authStore.user?.status === 'offline'" name="check" />
           </q-item-section>
         </q-item>
-        <q-item clickable @click="authStore.setUserStatus('dnd')">
+        <q-item clickable @click="setUserStatus('dnd')">
           <q-item-section avatar>
             <q-icon name="do_not_disturb_on" color="orange" />
           </q-item-section>
@@ -73,6 +73,9 @@
 import { defineComponent } from 'vue'
 
 import { useAuthStore } from 'src/stores'
+import { activityService } from 'src/services'
+
+import type { UserStatus } from 'src/contracts'
 
 export default defineComponent({
   name: 'SettingsPage',
@@ -84,13 +87,14 @@ export default defineComponent({
   },
 
   computed: {
-    notification: {
+    notifications: {
       get() {
         return this.authStore.user?.notifications === 'enabled' || this.authStore.user?.notifications === 'mentions'
       },
       set(value: boolean) {
         if (this.authStore.user?.notifications) {
           this.authStore.user.notifications = value ? 'enabled' : 'disabled'
+          activityService.updateNotificationSettings(this.authStore.user.notifications)
         }
       },
     },
@@ -102,6 +106,7 @@ export default defineComponent({
       set(value: boolean) {
         if (this.authStore.user?.notifications) {
           this.authStore.user.notifications = value ? 'mentions' : 'enabled'
+          activityService.updateNotificationSettings(this.authStore.user.notifications)
         }
       },
     },
@@ -112,6 +117,13 @@ export default defineComponent({
 
     isNotificationMentionsDisabled() {
       return this.authStore.user?.notifications === 'disabled'
+    },
+  },
+
+  methods: {
+    setUserStatus(status: UserStatus) {
+      activityService.updateStatus(status)
+      this.authStore.setUserStatus(status)
     },
   },
 })

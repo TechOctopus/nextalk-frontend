@@ -1,5 +1,13 @@
 <template>
-  <q-chat-message :name="fullUserName" :sent="isSent" :stamp="stamp">
+  <q-chat-message v-if="message.typing" :name="fullUserName">
+    <q-btn flat dense style="width: 100%; height: 2rem">
+      <q-spinner-dots />
+      <q-menu fit auto-close>
+        <p class="message_typing">{{ message.content }}</p>
+      </q-menu>
+    </q-btn>
+  </q-chat-message>
+  <q-chat-message v-else :name="fullUserName" :sent="isSent" :stamp="stamp">
     <div>
       <q-badge v-if="isMention" rounded color="orange" floating>
         <q-icon name="person" />
@@ -23,6 +31,7 @@ export default defineComponent({
 
   data() {
     return {
+      messageTyping: '',
       authStore: useAuthStore(),
     }
   },
@@ -53,9 +62,3 @@ export default defineComponent({
   },
 })
 </script>
-
-<style lang="scss">
-.mention {
-  color: blue;
-}
-</style>
